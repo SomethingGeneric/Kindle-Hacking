@@ -1,7 +1,7 @@
 #!/bin/bash
 #BASH source code from http://ftp.gnu.org/gnu/bash/ 
 #Warnings during the compilation process seem to be alright, errors would be bad ;)
-BASH_VERSION="bash-5.0"
+BASH_VERSION="bash-4.0"
 
 echo "[INFO] Checking if packages installed"
 dpkg --status autoconf 2>&1 | grep -qP "not installed|not-installed"
