@@ -1,0 +1,23 @@
+#!/bin/sh
+
+echo "Dump location (or enter nothing for USB root): "
+read loc
+
+if [ $loc = "" ]
+then
+    loc=/mnt/us
+fi
+
+echo "Would you like to echo to stdout too? (y/n): "
+read verb
+
+mntroot rw
+
+if [ $verb = "y" ]
+then
+    for file in $(find /); do echo $file; echo file >> $loc/dump.txt; done
+else
+    for file in $(find /); do echo file >> $loc/dump.txt; done
+fi
+
+echo "FS dump saved to $loc/dump.txt"

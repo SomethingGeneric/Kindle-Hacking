@@ -1,0 +1,15 @@
+#!/bin/sh
+
+echo "Listing files identified as in trash:"
+
+for dir in $(find / | grep .Trash); do echo "- Found $dir"; done
+
+echo "Enter 'y' to delete, or nothing to cancel"
+read kik
+
+if [ $kik = 'y' ]
+then
+    for dir in $(find / | grep .Trash); do echo "Deleting $dir"; rm -rf $dir; done
+else
+    echo "No changes made"
+fi
