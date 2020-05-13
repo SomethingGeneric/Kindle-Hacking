@@ -1,0 +1,17 @@
+git clone https://github.com/Dushistov/sdcv.git
+cd sdcv
+patch -p1 < ~/MPLAYER/koreader-base/thirdparty/sdcv/sdcv.patch
+mkdir build
+cd build
+export CFLAGS="${BASE_CFLAGS} -I ${TC_BUILD_DIR}/include"
+export CXXFLAGS="${BASE_CFLAGS} -I ${TC_BUILD_DIR}/include"
+export LDFLAGS="${BASE_LDFLAGS} -static-libstdc++"
+cmake -DCMAKE_C_COMPILER=${CROSS_TC}-gcc -DCMAKE_CXX_COMPILER=${CROSS_TC}-g++ -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_INSTALL_PREFIX="${TC_BUILD_DIR}" -DENABLE_NLS=OFF -DWITH_READLINE=OFF ..
+make -j2 VERBOSE=1
+make install
+${CROSS_TC}-strip --strip-unneeded ../../bin/sdcv
+# And now magically unbreak it! (On Kobo, at least). (Fixed w/ newer TCs! \o/)
+#patchelf --replace-needed ld-linux.so.3 ld-linux-armhf.so.3  ../../bin/sdcv
+export LDFLAGS="${BASE_LDFLAGS}"
+export CXXFLAGS="${BASE_CXXFLAGS}"
+export CFLAGS="${BASE_CFLAGS}"

@@ -1,0 +1,352 @@
+diff --git a/Makefile.am b/Makefile.am
+index 6d472569..ceef7bdd 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -191,6 +191,7 @@ libstrace_a_SOURCES =	\
+ 	msghdr.c	\
+ 	msghdr.h	\
+ 	mtd.c		\
++	sunxi.c		\
+ 	native_defs.h	\
+ 	nbd_ioctl.c	\
+ 	negated_errno.h	\
+diff --git a/defs.h b/defs.h
+index 0968bc35..30bbddb1 100644
+--- a/defs.h
++++ b/defs.h
+@@ -1140,6 +1140,7 @@ DECL_IOCTL(term);
+ DECL_IOCTL(ubi);
+ DECL_IOCTL(uffdio);
+ DECL_IOCTL(watchdog);
++DECL_IOCTL(sunxi);
+ # undef DECL_IOCTL
+ 
+ extern int decode_sg_io_v4(struct tcb *, const kernel_ulong_t arg);
+diff --git a/ioctl.c b/ioctl.c
+index de2a946f..9d0df1f1 100644
+--- a/ioctl.c
++++ b/ioctl.c
+@@ -274,6 +274,8 @@ ioctl_decode(struct tcb *tcp)
+ 	switch (_IOC_TYPE(code)) {
+ 	case 0x03:
+ 		return hdio_ioctl(tcp, code, arg);
++	case 0x04:
++		return sunxi_ioctl(tcp, code, arg);
+ 	case 0x12:
+ 		return block_ioctl(tcp, code, arg);
+ 	case '"': /* 0x22 */
+diff --git a/linux/drv_display_sun4i.h b/linux/drv_display_sun4i.h
+index e7b1ae26..c89f7bd6 100644
+--- a/linux/drv_display_sun4i.h
++++ b/linux/drv_display_sun4i.h
+@@ -1,6 +1,10 @@
+ // Pulled from the real <linux/drv_display_sun4i.h>
++// c.f., https://github.com/BOOKEEN/kernel-linux-3.0/blob/master/include/linux/drv_display_sun4i.h
+ // enum -> define conversion to make strace's scripts happy.
+ 
++#include <linux/types.h>
++
++// c.f., __disp_cmd_t
+ #define DISP_CMD_EINK_INIT		0x0400
+ #define DISP_CMD_EINK_UNINIT		0x0401
+ #define DISP_CMD_EINK_UPDATE		0x0402
+@@ -9,3 +13,108 @@
+ #define DISP_CMD_EINK_GET_UPDATE_STATUS	0x0405
+ #define DISP_CMD_SET_3V3		0x0407
+ 
++// Imported as-is
++typedef enum
++{
++	PIXEL_MONO_4BPP,
++	PIXEL_MONO_8BPP,
++}__pixel_rgbfmt_t;
++
++typedef enum
++{
++	EINK_INIT_MODE			= 0x01,
++	EINK_DU_MODE			= 0x02,
++	EINK_GC16_MODE			= 0x04,
++	EINK_GC4_MODE			= 0x08,
++	EINK_A2_MODE			= 0x10,
++	EINK_SHORT_GC16_LOCAL_MODE	= 0x20,
++	EINK_SHORT_DU_MODE		= 0x40,
++	EINK_LOCAL_MODE			= 0x80,
++	EINK_A2_OUT_MODE		= 0x100,
++	EINK_DITHERING_MODE		= 0x200,
++	EINK_RECTANGLE_MODE		= 0x400,
++	EINK_A2_IN_MODE			= 0x800
++}__eink_update_mode;
++
++
++// From "drivers/video/sun5i/disp/de_bsp/bsp_display.h"
++typedef struct
++{
++	__u32			width;
++	__u32			height;
++	__pixel_rgbfmt_t	pixelfmt;
++}__eink_init_para;
++
++
++// And now, custom convenience structures to make the ioctls slightly less unwieldy...
++// NOTE: The ioctl handler is a little wee bit insane in that it first does a copy of a fixed amount of bits in a set structure,
++//       then proceeds to shuffle those around and even sometime do another copy from there in order to please each subcommand...
++//       c.f., disp_ioctl() @ drivers/video/sun5i/disp/dev_disp.c
++//       As Vader would say, I find your lack of pointers disturbing...
++
++// Start with the actual layout expected by each command we care about...
++// NOTE: sel appears to be used as a screen id (when it is used, which turns out to be rarely in the eink codepaths)?
++//       We only have a single screen and a single fb to contend with here, so, that's mostly going to be set to 0.
++typedef struct
++{
++	__u32			sel;		// ubuffer[0]
++	__eink_init_para	eink_init_para; // Starts at &ubuffer[1]
++} sunxi_eink_init;
++
++typedef struct
++{
++	__u32			x_start;
++	__u32			x_end;
++	__u32			y_start;
++	__u32			y_end;
++} sunxi_coordinates;
++
++typedef struct
++{
++	__u32			sel;		// ubuffer[0]
++	__u32			fb_id;		// ubuffer[1]
++	__u32			mode;		// ubuffer[2], bitmask, c.f., __eink_update_mode
++	unsigned char		garbage[4];	// ubuffer[3], never passed to Disp_eink_update()
++	sunxi_coordinates	coordinates;	// 1:1 match for coordinate
++} sunxi_eink_update;
++
++typedef struct
++{
++	__u32			sel;	// ubuffer[0]
++	__u32			mode;	// ubuffer[1], bitmask, c.f., __eink_update_mode
++} sunxi_eink_set_mode;
++
++typedef struct
++{
++	__u32			sel;	// ubuffer[0]
++	__u32			temp;	// ubuffer[1]
++} sunxi_eink_set_temperature;
++
++// For the few commands (uninit, get_update_status) that only pass sel
++typedef struct
++{
++	__u32			sel;	// ubuffer[0]
++} sunxi_eink;
++
++// That's the madness the ioctl handler first copies stuff into...
++// NOTE: To make matters worse, those are actually declared unsigned long on one side and u32 on the other...
++//       Thankfully, we're on Linux, 32-bit, so LP32,
++//       but this would hilariously blow up on Linux, 64-bit (which is LP64, unlike Windows' LLP64, where this would behave)...
++typedef struct
++{
++	__u32			ubuffer[4];
++	__u32			coordinate[4];	// *sic*
++} sunxi_disp_ioctl_s;
++
++// And then fit everything inside the fixed layout the ioctl handler expects, via union magic.
++typedef union
++{
++	// Actual memory layout
++	sunxi_disp_ioctl_s raw;
++	// Subcommands
++	sunxi_eink_init eink_init;
++	sunxi_eink_update eink_update;
++	sunxi_eink_set_mode eink_set_mode;
++	sunxi_eink_set_temperature eink_set_temperature;
++	sunxi_eink eink;
++} sunxi_disp_ioctl;
+diff --git a/sunxi.c b/sunxi.c
+new file mode 100644
+index 00000000..dcab39b5
+--- /dev/null
++++ b/sunxi.c
+@@ -0,0 +1,157 @@
++/*
++ * Copyright (c) 2018-2020 NiLuJe <ninuje@gmail.com>
++ * Extended from an original implementation:
++ * Copyright (c) 2014 Andrey Golovizin <ag@sologoc.com>
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. The name of the author may not be used to endorse or promote products
++ *    derived from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
++ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
++ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
++ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
++ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
++ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#include "defs.h"
++#include <linux/ioctl.h>
++#include <linux/drv_display_sun4i.h>
++
++#include "xlat/sunxi_pixel_fmt.h"
++#include "xlat/sunxi_update_mode.h"
++
++
++void print_eink_init(__eink_init_para* para)
++{
++	tprintf(
++		"width=%" PRIu32", height=%" PRIu32,
++		para->width, para->height
++	);
++	tprints(", pixelfmt=");
++	printxval(sunxi_pixel_fmt, para->pixelfmt, "PIXEL_MONO_???");
++}
++
++
++void print_rect(sunxi_coordinates* coords)
++{
++	tprintf(
++		"x_start=%" PRIu32", x_end=%" PRIu32", y_start=%" PRIu32", y_end=%" PRIu32,
++		coords->x_start, coords->x_end, coords->y_start, coords->y_end
++	);
++}
++
++int sunxi_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t arg)
++{
++	sunxi_disp_ioctl data;
++
++	switch (code)
++	{
++		case DISP_CMD_EINK_INIT:
++			if (!verbose(tcp) || umove(tcp, arg, &data) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				tprintf("sel=%" PRIu32, data.eink_init.sel);
++				tprints(", eink_init_para={");
++				print_eink_init(&data.eink_init.eink_init_para);
++				tprints("}");
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case DISP_CMD_EINK_UNINIT:
++		case DISP_CMD_EINK_GET_UPDATE_STATUS:
++			if (!verbose(tcp) || umove(tcp, arg, &data) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				tprintf("sel=%" PRIu32, data.eink.sel);
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case DISP_CMD_EINK_UPDATE:
++			if (!verbose(tcp) || umove(tcp, arg, &data) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				tprintf("sel=%" PRIu32, data.eink_update.sel);
++				tprintf(", fb_id=%" PRIu32, data.eink_update.fb_id);
++				tprints(", mode=");
++				printflags(sunxi_update_mode, data.eink_update.mode, "EINK_???");
++				tprints(", coordinates={");
++				print_rect(&data.eink_update.coordinates);
++				tprints("}");
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case DISP_CMD_EINK_SET_MODE:
++			if (!verbose(tcp) || umove(tcp, arg, &data) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				tprintf("sel=%" PRIu32, data.eink_set_mode.sel);
++				tprints(", mode=");
++				printflags(sunxi_update_mode, data.eink_set_mode.mode, "EINK_???");
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case DISP_CMD_EINK_SET_TEMPERATURE:
++			if (!verbose(tcp) || umove(tcp, arg, &data) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				tprintf("sel=%" PRIu32, data.eink_set_temperature.sel);
++				tprintf(", temp=%" PRIu32, data.eink_set_temperature.temp);
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		// No args :)
++		//case DISP_CMD_SET_3V3:
++
++		default:
++			return 0;
++	}
++}
+diff --git a/xlat/sunxi_pixel_fmt.in b/xlat/sunxi_pixel_fmt.in
+new file mode 100644
+index 00000000..073314eb
+--- /dev/null
++++ b/xlat/sunxi_pixel_fmt.in
+@@ -0,0 +1,3 @@
++#unconditional
++PIXEL_MONO_4BPP
++PIXEL_MONO_8BPP
+diff --git a/xlat/sunxi_update_mode.in b/xlat/sunxi_update_mode.in
+new file mode 100644
+index 00000000..8e1038a0
+--- /dev/null
++++ b/xlat/sunxi_update_mode.in
+@@ -0,0 +1,13 @@
++#unconditional
++EINK_INIT_MODE
++EINK_DU_MODE
++EINK_GC16_MODE
++EINK_GC4_MODE
++EINK_A2_MODE
++EINK_SHORT_GC16_LOCAL_MODE
++EINK_SHORT_DU_MODE
++EINK_LOCAL_MODE
++EINK_A2_OUT_MODE
++EINK_DITHERING_MODE
++EINK_RECTANGLE_MODE
++EINK_A2_IN_MODE

@@ -1,0 +1,1061 @@
+diff --git a/Action.c b/Action.c
+index 518d103..9a7c3c5 100644
+--- a/Action.c
++++ b/Action.c
+@@ -474,7 +474,7 @@ static Htop_Reaction actionHelp(State* st) {
+       addattrstr(CRT_colors[CPU_NICE_TEXT], "low-priority"); addstr("/");
+       addattrstr(CRT_colors[CPU_NORMAL], "normal"); addstr("/");
+       addattrstr(CRT_colors[CPU_KERNEL], "kernel"); addstr("/");
+-      addattrstr(CRT_colors[CPU_STEAL], "virtualiz");
++      addattrstr(CRT_colors[CPU_GUEST], "virtualiz");
+       addattrstr(CRT_colors[BAR_SHADOW], "               used%");
+    }
+    addattrstr(CRT_colors[BAR_BORDER], "]");
+diff --git a/INSTALL b/INSTALL
+deleted file mode 100644
+index 2099840..0000000
+--- a/INSTALL
++++ /dev/null
+@@ -1,370 +0,0 @@
+-Installation Instructions
+-*************************
+-
+-Copyright (C) 1994-1996, 1999-2002, 2004-2013 Free Software Foundation,
+-Inc.
+-
+-   Copying and distribution of this file, with or without modification,
+-are permitted in any medium without royalty provided the copyright
+-notice and this notice are preserved.  This file is offered as-is,
+-without warranty of any kind.
+-
+-Basic Installation
+-==================
+-
+-   Briefly, the shell command `./configure && make && make install'
+-should configure, build, and install this package.  The following
+-more-detailed instructions are generic; see the `README' file for
+-instructions specific to this package.  Some packages provide this
+-`INSTALL' file but do not implement all of the features documented
+-below.  The lack of an optional feature in a given package is not
+-necessarily a bug.  More recommendations for GNU packages can be found
+-in *note Makefile Conventions: (standards)Makefile Conventions.
+-
+-   The `configure' shell script attempts to guess correct values for
+-various system-dependent variables used during compilation.  It uses
+-those values to create a `Makefile' in each directory of the package.
+-It may also create one or more `.h' files containing system-dependent
+-definitions.  Finally, it creates a shell script `config.status' that
+-you can run in the future to recreate the current configuration, and a
+-file `config.log' containing compiler output (useful mainly for
+-debugging `configure').
+-
+-   It can also use an optional file (typically called `config.cache'
+-and enabled with `--cache-file=config.cache' or simply `-C') that saves
+-the results of its tests to speed up reconfiguring.  Caching is
+-disabled by default to prevent problems with accidental use of stale
+-cache files.
+-
+-   If you need to do unusual things to compile the package, please try
+-to figure out how `configure' could check whether to do them, and mail
+-diffs or instructions to the address given in the `README' so they can
+-be considered for the next release.  If you are using the cache, and at
+-some point `config.cache' contains results you don't want to keep, you
+-may remove or edit it.
+-
+-   The file `configure.ac' (or `configure.in') is used to create
+-`configure' by a program called `autoconf'.  You need `configure.ac' if
+-you want to change it or regenerate `configure' using a newer version
+-of `autoconf'.
+-
+-   The simplest way to compile this package is:
+-
+-  1. `cd' to the directory containing the package's source code and type
+-     `./configure' to configure the package for your system.
+-
+-     Running `configure' might take a while.  While running, it prints
+-     some messages telling which features it is checking for.
+-
+-  2. Type `make' to compile the package.
+-
+-  3. Optionally, type `make check' to run any self-tests that come with
+-     the package, generally using the just-built uninstalled binaries.
+-
+-  4. Type `make install' to install the programs and any data files and
+-     documentation.  When installing into a prefix owned by root, it is
+-     recommended that the package be configured and built as a regular
+-     user, and only the `make install' phase executed with root
+-     privileges.
+-
+-  5. Optionally, type `make installcheck' to repeat any self-tests, but
+-     this time using the binaries in their final installed location.
+-     This target does not install anything.  Running this target as a
+-     regular user, particularly if the prior `make install' required
+-     root privileges, verifies that the installation completed
+-     correctly.
+-
+-  6. You can remove the program binaries and object files from the
+-     source code directory by typing `make clean'.  To also remove the
+-     files that `configure' created (so you can compile the package for
+-     a different kind of computer), type `make distclean'.  There is
+-     also a `make maintainer-clean' target, but that is intended mainly
+-     for the package's developers.  If you use it, you may have to get
+-     all sorts of other programs in order to regenerate files that came
+-     with the distribution.
+-
+-  7. Often, you can also type `make uninstall' to remove the installed
+-     files again.  In practice, not all packages have tested that
+-     uninstallation works correctly, even though it is required by the
+-     GNU Coding Standards.
+-
+-  8. Some packages, particularly those that use Automake, provide `make
+-     distcheck', which can by used by developers to test that all other
+-     targets like `make install' and `make uninstall' work correctly.
+-     This target is generally not run by end users.
+-
+-Compilers and Options
+-=====================
+-
+-   Some systems require unusual options for compilation or linking that
+-the `configure' script does not know about.  Run `./configure --help'
+-for details on some of the pertinent environment variables.
+-
+-   You can give `configure' initial values for configuration parameters
+-by setting variables in the command line or in the environment.  Here
+-is an example:
+-
+-     ./configure CC=c99 CFLAGS=-g LIBS=-lposix
+-
+-   *Note Defining Variables::, for more details.
+-
+-Compiling For Multiple Architectures
+-====================================
+-
+-   You can compile the package for more than one kind of computer at the
+-same time, by placing the object files for each architecture in their
+-own directory.  To do this, you can use GNU `make'.  `cd' to the
+-directory where you want the object files and executables to go and run
+-the `configure' script.  `configure' automatically checks for the
+-source code in the directory that `configure' is in and in `..'.  This
+-is known as a "VPATH" build.
+-
+-   With a non-GNU `make', it is safer to compile the package for one
+-architecture at a time in the source code directory.  After you have
+-installed the package for one architecture, use `make distclean' before
+-reconfiguring for another architecture.
+-
+-   On MacOS X 10.5 and later systems, you can create libraries and
+-executables that work on multiple system types--known as "fat" or
+-"universal" binaries--by specifying multiple `-arch' options to the
+-compiler but only a single `-arch' option to the preprocessor.  Like
+-this:
+-
+-     ./configure CC="gcc -arch i386 -arch x86_64 -arch ppc -arch ppc64" \
+-                 CXX="g++ -arch i386 -arch x86_64 -arch ppc -arch ppc64" \
+-                 CPP="gcc -E" CXXCPP="g++ -E"
+-
+-   This is not guaranteed to produce working output in all cases, you
+-may have to build one architecture at a time and combine the results
+-using the `lipo' tool if you have problems.
+-
+-Installation Names
+-==================
+-
+-   By default, `make install' installs the package's commands under
+-`/usr/local/bin', include files under `/usr/local/include', etc.  You
+-can specify an installation prefix other than `/usr/local' by giving
+-`configure' the option `--prefix=PREFIX', where PREFIX must be an
+-absolute file name.
+-
+-   You can specify separate installation prefixes for
+-architecture-specific files and architecture-independent files.  If you
+-pass the option `--exec-prefix=PREFIX' to `configure', the package uses
+-PREFIX as the prefix for installing programs and libraries.
+-Documentation and other data files still use the regular prefix.
+-
+-   In addition, if you use an unusual directory layout you can give
+-options like `--bindir=DIR' to specify different values for particular
+-kinds of files.  Run `configure --help' for a list of the directories
+-you can set and what kinds of files go in them.  In general, the
+-default for these options is expressed in terms of `${prefix}', so that
+-specifying just `--prefix' will affect all of the other directory
+-specifications that were not explicitly provided.
+-
+-   The most portable way to affect installation locations is to pass the
+-correct locations to `configure'; however, many packages provide one or
+-both of the following shortcuts of passing variable assignments to the
+-`make install' command line to change installation locations without
+-having to reconfigure or recompile.
+-
+-   The first method involves providing an override variable for each
+-affected directory.  For example, `make install
+-prefix=/alternate/directory' will choose an alternate location for all
+-directory configuration variables that were expressed in terms of
+-`${prefix}'.  Any directories that were specified during `configure',
+-but not in terms of `${prefix}', must each be overridden at install
+-time for the entire installation to be relocated.  The approach of
+-makefile variable overrides for each directory variable is required by
+-the GNU Coding Standards, and ideally causes no recompilation.
+-However, some platforms have known limitations with the semantics of
+-shared libraries that end up requiring recompilation when using this
+-method, particularly noticeable in packages that use GNU Libtool.
+-
+-   The second method involves providing the `DESTDIR' variable.  For
+-example, `make install DESTDIR=/alternate/directory' will prepend
+-`/alternate/directory' before all installation names.  The approach of
+-`DESTDIR' overrides is not required by the GNU Coding Standards, and
+-does not work on platforms that have drive letters.  On the other hand,
+-it does better at avoiding recompilation issues, and works well even
+-when some directory options were not specified in terms of `${prefix}'
+-at `configure' time.
+-
+-Optional Features
+-=================
+-
+-   If the package supports it, you can cause programs to be installed
+-with an extra prefix or suffix on their names by giving `configure' the
+-option `--program-prefix=PREFIX' or `--program-suffix=SUFFIX'.
+-
+-   Some packages pay attention to `--enable-FEATURE' options to
+-`configure', where FEATURE indicates an optional part of the package.
+-They may also pay attention to `--with-PACKAGE' options, where PACKAGE
+-is something like `gnu-as' or `x' (for the X Window System).  The
+-`README' should mention any `--enable-' and `--with-' options that the
+-package recognizes.
+-
+-   For packages that use the X Window System, `configure' can usually
+-find the X include and library files automatically, but if it doesn't,
+-you can use the `configure' options `--x-includes=DIR' and
+-`--x-libraries=DIR' to specify their locations.
+-
+-   Some packages offer the ability to configure how verbose the
+-execution of `make' will be.  For these packages, running `./configure
+---enable-silent-rules' sets the default to minimal output, which can be
+-overridden with `make V=1'; while running `./configure
+---disable-silent-rules' sets the default to verbose, which can be
+-overridden with `make V=0'.
+-
+-Particular systems
+-==================
+-
+-   On HP-UX, the default C compiler is not ANSI C compatible.  If GNU
+-CC is not installed, it is recommended to use the following options in
+-order to use an ANSI C compiler:
+-
+-     ./configure CC="cc -Ae -D_XOPEN_SOURCE=500"
+-
+-and if that doesn't work, install pre-built binaries of GCC for HP-UX.
+-
+-   HP-UX `make' updates targets which have the same time stamps as
+-their prerequisites, which makes it generally unusable when shipped
+-generated files such as `configure' are involved.  Use GNU `make'
+-instead.
+-
+-   On OSF/1 a.k.a. Tru64, some versions of the default C compiler cannot
+-parse its `<wchar.h>' header file.  The option `-nodtk' can be used as
+-a workaround.  If GNU CC is not installed, it is therefore recommended
+-to try
+-
+-     ./configure CC="cc"
+-
+-and if that doesn't work, try
+-
+-     ./configure CC="cc -nodtk"
+-
+-   On Solaris, don't put `/usr/ucb' early in your `PATH'.  This
+-directory contains several dysfunctional programs; working variants of
+-these programs are available in `/usr/bin'.  So, if you need `/usr/ucb'
+-in your `PATH', put it _after_ `/usr/bin'.
+-
+-   On Haiku, software installed for all users goes in `/boot/common',
+-not `/usr/local'.  It is recommended to use the following options:
+-
+-     ./configure --prefix=/boot/common
+-
+-Specifying the System Type
+-==========================
+-
+-   There may be some features `configure' cannot figure out
+-automatically, but needs to determine by the type of machine the package
+-will run on.  Usually, assuming the package is built to be run on the
+-_same_ architectures, `configure' can figure that out, but if it prints
+-a message saying it cannot guess the machine type, give it the
+-`--build=TYPE' option.  TYPE can either be a short name for the system
+-type, such as `sun4', or a canonical name which has the form:
+-
+-     CPU-COMPANY-SYSTEM
+-
+-where SYSTEM can have one of these forms:
+-
+-     OS
+-     KERNEL-OS
+-
+-   See the file `config.sub' for the possible values of each field.  If
+-`config.sub' isn't included in this package, then this package doesn't
+-need to know the machine type.
+-
+-   If you are _building_ compiler tools for cross-compiling, you should
+-use the option `--target=TYPE' to select the type of system they will
+-produce code for.
+-
+-   If you want to _use_ a cross compiler, that generates code for a
+-platform different from the build platform, you should specify the
+-"host" platform (i.e., that on which the generated programs will
+-eventually be run) with `--host=TYPE'.
+-
+-Sharing Defaults
+-================
+-
+-   If you want to set default values for `configure' scripts to share,
+-you can create a site shell script called `config.site' that gives
+-default values for variables like `CC', `cache_file', and `prefix'.
+-`configure' looks for `PREFIX/share/config.site' if it exists, then
+-`PREFIX/etc/config.site' if it exists.  Or, you can set the
+-`CONFIG_SITE' environment variable to the location of the site script.
+-A warning: not all `configure' scripts look for a site script.
+-
+-Defining Variables
+-==================
+-
+-   Variables not defined in a site shell script can be set in the
+-environment passed to `configure'.  However, some packages may run
+-configure again during the build, and the customized values of these
+-variables may be lost.  In order to avoid this problem, you should set
+-them in the `configure' command line, using `VAR=value'.  For example:
+-
+-     ./configure CC=/usr/local2/bin/gcc
+-
+-causes the specified `gcc' to be used as the C compiler (unless it is
+-overridden in the site shell script).
+-
+-Unfortunately, this technique does not work for `CONFIG_SHELL' due to
+-an Autoconf limitation.  Until the limitation is lifted, you can use
+-this workaround:
+-
+-     CONFIG_SHELL=/bin/bash ./configure CONFIG_SHELL=/bin/bash
+-
+-`configure' Invocation
+-======================
+-
+-   `configure' recognizes the following options to control how it
+-operates.
+-
+-`--help'
+-`-h'
+-     Print a summary of all of the options to `configure', and exit.
+-
+-`--help=short'
+-`--help=recursive'
+-     Print a summary of the options unique to this package's
+-     `configure', and exit.  The `short' variant lists options used
+-     only in the top level, while the `recursive' variant lists options
+-     also present in any nested packages.
+-
+-`--version'
+-`-V'
+-     Print the version of Autoconf used to generate the `configure'
+-     script, and exit.
+-
+-`--cache-file=FILE'
+-     Enable the cache: use and save the results of the tests in FILE,
+-     traditionally `config.cache'.  FILE defaults to `/dev/null' to
+-     disable caching.
+-
+-`--config-cache'
+-`-C'
+-     Alias for `--cache-file=config.cache'.
+-
+-`--quiet'
+-`--silent'
+-`-q'
+-     Do not print messages saying which checks are being made.  To
+-     suppress all normal output, redirect it to `/dev/null' (any error
+-     messages will still be shown).
+-
+-`--srcdir=DIR'
+-     Look for the package's source code in directory DIR.  Usually
+-     `configure' can determine that directory automatically.
+-
+-`--prefix=DIR'
+-     Use DIR as the installation prefix.  *note Installation Names::
+-     for more details, including other options available for fine-tuning
+-     the installation locations.
+-
+-`--no-create'
+-`-n'
+-     Run the configure checks, but stop before creating any output
+-     files.
+-
+-`configure' also accepts some other, not widely useful, options.  Run
+-`configure --help' for more details.
+diff --git a/Makefile.am b/Makefile.am
+index cd5209c..7d19600 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -210,6 +210,13 @@ coverage:
+ cppcheck:
+ 	cppcheck -q -v . --enable=all -DHAVE_CGROUP -DHAVE_OPENVZ -DHAVE_TASKSTATS
+ 
++dist-hook: $(top_distdir)/configure
++	@if grep 'pkg_m4_absent' '$(top_distdir)/configure'; then \
++	   echo 'configure is generated without pkg.m4. Please supply pkg.m4 and run ./autogen.sh to rebuild the configure script.'>&2; \
++	   (exit 1); \
++	else :; \
++	fi
++
+ .PHONY: lcov
+ 
+ lcov:
+diff --git a/Process.c b/Process.c
+index 471f529..54c41af 100644
+--- a/Process.c
++++ b/Process.c
+@@ -228,7 +228,7 @@ void Process_humanNumber(RichString* str, unsigned long number, bool coloring) {
+    if(number >= (10 * ONE_DECIMAL_M)) {
+       #ifdef __LP64__
+       if(number >= (100 * ONE_DECIMAL_G)) {
+-         len = snprintf(buffer, 10, "%4ldT ", number / ONE_G);
++         len = snprintf(buffer, 10, "%4luT ", number / ONE_G);
+          RichString_appendn(str, largeNumberColor, buffer, len);
+          return;
+       } else if (number >= (1000 * ONE_DECIMAL_M)) {
+@@ -238,7 +238,7 @@ void Process_humanNumber(RichString* str, unsigned long number, bool coloring) {
+       }
+       #endif
+       if(number >= (100 * ONE_DECIMAL_M)) {
+-         len = snprintf(buffer, 10, "%4ldG ", number / ONE_M);
++         len = snprintf(buffer, 10, "%4luG ", number / ONE_M);
+          RichString_appendn(str, largeNumberColor, buffer, len);
+          return;
+       }
+@@ -246,11 +246,11 @@ void Process_humanNumber(RichString* str, unsigned long number, bool coloring) {
+       RichString_appendn(str, largeNumberColor, buffer, len);
+       return;
+    } else if (number >= 100000) {
+-      len = snprintf(buffer, 10, "%4ldM ", number / ONE_K);
++      len = snprintf(buffer, 10, "%4luM ", number / ONE_K);
+       RichString_appendn(str, processMegabytesColor, buffer, len);
+       return;
+    } else if (number >= 1000) {
+-      len = snprintf(buffer, 10, "%2ld", number/1000);
++      len = snprintf(buffer, 10, "%2lu", number/1000);
+       RichString_appendn(str, processMegabytesColor, buffer, len);
+       number %= 1000;
+       len = snprintf(buffer, 10, "%03lu ", number);
+@@ -278,7 +278,7 @@ void Process_colorNumber(RichString* str, unsigned long long number, bool colori
+       int len = snprintf(buffer, 13, "    no perm ");
+       RichString_appendn(str, CRT_colors[PROCESS_SHADOW], buffer, len);
+    } else if (number > 10000000000) {
+-      xSnprintf(buffer, 13, "%11lld ", number / 1000);
++      xSnprintf(buffer, 13, "%11llu ", number / 1000);
+       RichString_appendn(str, largeNumberColor, buffer, 5);
+       RichString_appendn(str, processMegabytesColor, buffer+5, 3);
+       RichString_appendn(str, processColor, buffer+8, 4);
+@@ -380,9 +380,9 @@ void Process_writeField(Process* this, RichString* str, ProcessField field) {
+    switch (field) {
+    case PERCENT_CPU: {
+       if (this->percent_cpu > 999.9) {
+-         xSnprintf(buffer, n, "%4d ", (unsigned int)this->percent_cpu); 
++         xSnprintf(buffer, n, "%4u ", (unsigned int)this->percent_cpu); 
+       } else if (this->percent_cpu > 99.9) {
+-         xSnprintf(buffer, n, "%3d. ", (unsigned int)this->percent_cpu); 
++         xSnprintf(buffer, n, "%3u. ", (unsigned int)this->percent_cpu); 
+       } else {
+          xSnprintf(buffer, n, "%4.1f ", this->percent_cpu);
+       }
+@@ -414,11 +414,16 @@ void Process_writeField(Process* this, RichString* str, ProcessField field) {
+             if (indent & (1U << i))
+                maxIndent = i+1;
+           for (int i = 0; i < maxIndent - 1; i++) {
+-            int written;
++            int written, ret;
+             if (indent & (1 << i))
+-               written = snprintf(buf, n, "%s  ", CRT_treeStr[TREE_STR_VERT]);
++               ret = snprintf(buf, n, "%s  ", CRT_treeStr[TREE_STR_VERT]);
+             else
+-               written = snprintf(buf, n, "   ");
++               ret = snprintf(buf, n, "   ");
++            if (ret < 0 || ret >= n) {
++               written = n;
++            } else {
++               written = ret;
++            }
+             buf += written;
+             n -= written;
+          }
+diff --git a/ScreenManager.c b/ScreenManager.c
+index 05e1c02..06e9019 100644
+--- a/ScreenManager.c
++++ b/ScreenManager.c
+@@ -145,14 +145,12 @@ static void checkRecalculation(ScreenManager* this, double* oldTime, int* sortTi
+ }
+ 
+ static void ScreenManager_drawPanels(ScreenManager* this, int focus) {
+-   int nPanels = this->panelCount;
++   const int nPanels = this->panelCount;
+    for (int i = 0; i < nPanels; i++) {
+       Panel* panel = (Panel*) Vector_get(this->panels, i);
+       Panel_draw(panel, i == focus);
+-      if (i < nPanels) {
+-         if (this->orientation == HORIZONTAL) {
+-            mvvline(panel->y, panel->x+panel->w, ' ', panel->h+1);
+-         }
++      if (this->orientation == HORIZONTAL) {
++         mvvline(panel->y, panel->x+panel->w, ' ', panel->h+1);
+       }
+    }
+ }
+diff --git a/configure.ac b/configure.ac
+index 2c4fc5b..ffd8fed 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -292,7 +292,9 @@ then
+       LIBS="$LIBS $LIBNL3_LIBS $LIBNL3GENL_LIBS"
+       AC_DEFINE(HAVE_DELAYACCT, 1, [Define if delay accounting support should be enabled.])
+    ], [
+-     AC_MSG_ERROR([htop on Linux requires pkg-config for checking delayacct requirements. Please install pkg-config and run ./autogen.sh to rebuild the configure script.])
++      pkg_m4_absent=1
++      m4_warning([configure is generated without pkg.m4. 'make dist' target will be disabled.])
++      AC_MSG_ERROR([htop on Linux requires pkg-config for checking delayacct requirements. Please install pkg-config and run ./autogen.sh to rebuild the configure script.])
+    ])
+ fi
+ 
+diff --git a/darwin/DarwinProcessList.c b/darwin/DarwinProcessList.c
+index 4a580ac..0988448 100644
+--- a/darwin/DarwinProcessList.c
++++ b/darwin/DarwinProcessList.c
+@@ -84,9 +84,8 @@ void ProcessList_freeCPULoadInfo(processor_cpu_load_info_t *p) {
+        if(0 != munmap(*p, vm_page_size)) {
+            CRT_fatalError("Unable to free old CPU load information\n");
+        }
++       *p = NULL;
+    }
+-
+-   *p = NULL;
+ }
+ 
+ unsigned ProcessList_allocateCPULoadInfo(processor_cpu_load_info_t *p) {
+diff --git a/htop.1.in b/htop.1.in
+index 774bc09..149b146 100644
+--- a/htop.1.in
++++ b/htop.1.in
+@@ -85,8 +85,13 @@ Tag or untag a process. Commands that can operate on multiple processes,
+ like "kill", will then apply over the list of tagged processes, instead
+ of the currently highlighted one.
+ .TP
++.B c
++Tag the current process and its children. Commands that can operate on multiple
++processes, like "kill", will then apply over the list of tagged processes,
++instead of the currently highlighted one.
++.TP
+ .B U
+-Untag all processes (remove all tags added with the Space key).
++Untag all processes (remove all tags added with the Space or c keys).
+ .TP
+ .B s
+ Trace process system calls: if strace(1) is installed, pressing this key
+diff --git a/htop.c b/htop.c
+index 6db81dd..8c88c78 100644
+--- a/htop.c
++++ b/htop.c
+@@ -87,13 +87,12 @@ static CommandLineSettings parseArguments(int argc, char** argv) {
+       {"no-colour",no_argument,         0, 'C'},
+       {"tree",     no_argument,         0, 't'},
+       {"pid",      required_argument,   0, 'p'},
+-      {"io",       no_argument,         0, 'i'},
+       {0,0,0,0}
+    };
+ 
+    int opt, opti=0;
+    /* Parse arguments */
+-   while ((opt = getopt_long(argc, argv, "hvCst::d:u:p:i", long_opts, &opti))) {
++   while ((opt = getopt_long(argc, argv, "hvCs:td:u:p:", long_opts, &opti))) {
+       if (opt == EOF) break;
+       switch (opt) {
+          case 'h':
+diff --git a/htop.desktop b/htop.desktop
+index 13b71e7..d59a265 100644
+--- a/htop.desktop
++++ b/htop.desktop
+@@ -1,9 +1,37 @@
+ [Desktop Entry]
++Type=Application
+ Version=1.0
+ Name=Htop
+-Type=Application
++GenericName=Process Viewer
++GenericName[ca]=Visualitzador de processos
++GenericName[de]=Prozessanzeige
++GenericName[en_GB]=Process Viewer
++GenericName[es]=Visor de procesos
++GenericName[fi]=Prosessikatselin
++GenericName[fr]=Visualiseur de processus
++GenericName[gl]=Visor de procesos
++GenericName[it]=Visore dei processi
++GenericName[ko]=프로세스 뷰어
++GenericName[nb]=Prosessviser
++GenericName[nl]=Viewer van processen
++GenericName[nn]=Prosessvisar
++GenericName[pl]=Przeglądarka procesów
++GenericName[pt]=Visualizador de Processos
++GenericName[pt_BR]=Visualizador de processos
++GenericName[ru]=Монитор процессов
++GenericName[sk]=Prehliadač procesov
++GenericName[sl]=Pregledovalnik opravil
++GenericName[sr@ijekavian]=Приказивач процеса
++GenericName[sr@ijekavianlatin]=Prikazivač procesa
++GenericName[sr@latin]=Prikazivač procesa
++GenericName[sr]=Приказивач процеса
++GenericName[sv]=Processvisning
++GenericName[tr]=Süreç Görüntüleyici
++GenericName[uk]=Перегляд процесів
++GenericName[zh_CN]=进程查看器
++GenericName[zh_TW]=行程檢視器
+ Comment=Show System Processes
+-Comment[ca]=Mostra els processos del sistema
++Comment[ca]=Visualitzeu els processos del sistema
+ Comment[de]=Systemprozesse anzeigen
+ Comment[en_GB]=Show System Processes
+ Comment[es]=Mostrar procesos del sistema
+@@ -21,45 +49,17 @@ Comment[pt_BR]=Mostra os processos do sistema
+ Comment[ru]=Просмотр списка процессов в системе
+ Comment[sk]=Zobraziť systémové procesy
+ Comment[sl]=Prikaz sistemskih opravil
+-Comment[sr]=Приказ системских процеса
+ Comment[sr@ijekavian]=Приказ системских процеса
+ Comment[sr@ijekavianlatin]=Prikaz sistemskih procesa
+ Comment[sr@latin]=Prikaz sistemskih procesa
++Comment[sr]=Приказ системских процеса
+ Comment[sv]=Visa systemprocesser
+ Comment[tr]=Sistem Süreçlerini Göster
+ Comment[uk]=Перегляд системних процесів
+ Comment[zh_CN]=显示系统进程
+ Comment[zh_TW]=顯示系統行程
+-Terminal=true
+-Exec=htop
+ Icon=htop
+-Categories=ConsoleOnly;System;
+-GenericName=Process Viewer
+-GenericName[ca]=Visor de processos
+-GenericName[de]=Prozessanzeige
+-GenericName[en_GB]=Process Viewer
+-GenericName[es]=Visor de procesos
+-GenericName[fi]=Prosessikatselin
+-GenericName[fr]=Visualiseur de processus
+-GenericName[gl]=Visor de procesos
+-GenericName[it]=Visore dei processi
+-GenericName[ko]=프로세스 뷰어
+-GenericName[nb]=Prosessviser
+-GenericName[nl]=Viewer van processen
+-GenericName[nn]=Prosessvisar
+-GenericName[pl]=Przeglądarka procesów
+-GenericName[pt]=Visualizador de Processos
+-GenericName[pt_BR]=Visualizador de processos
+-GenericName[ru]=Монитор процессов
+-GenericName[sk]=Prehliadač procesov
+-GenericName[sl]=Pregledovalnik opravil
+-GenericName[sr]=Приказивач процеса
+-GenericName[sr@ijekavian]=Приказивач процеса
+-GenericName[sr@ijekavianlatin]=Prikazivač procesa
+-GenericName[sr@latin]=Prikazivač procesa
+-GenericName[sv]=Processvisning
+-GenericName[tr]=Süreç Görüntüleyici
+-GenericName[uk]=Перегляд процесів
+-GenericName[zh_CN]=进程查看器
+-GenericName[zh_TW]=行程檢視器
++Exec=htop
++Terminal=true
++Categories=System;Monitor;ConsoleOnly;
+ Keywords=system;process;task
+diff --git a/linux/LinuxProcess.c b/linux/LinuxProcess.c
+index 09ccbe1..5f69707 100644
+--- a/linux/LinuxProcess.c
++++ b/linux/LinuxProcess.c
+@@ -15,6 +15,7 @@ in the source distribution for its full text.
+ #include <unistd.h>
+ #include <string.h>
+ #include <sys/syscall.h>
++#include <time.h>
+ 
+ /*{
+ 
+@@ -106,6 +107,7 @@ typedef struct LinuxProcess_ {
+    long m_drs;
+    long m_lrs;
+    long m_dt;
++   unsigned long long starttime;
+    #ifdef HAVE_TASKSTATS
+    unsigned long long io_rchar;
+    unsigned long long io_wchar;
+@@ -143,7 +145,7 @@ typedef struct LinuxProcess_ {
+ } LinuxProcess;
+ 
+ #ifndef Process_isKernelThread
+-#define Process_isKernelThread(_process) ((LinuxProcess*)(_process)->isKernelThread)
++#define Process_isKernelThread(_process) (((LinuxProcess*)(_process))->isKernelThread)
+ #endif
+ 
+ #ifndef Process_isUserlandThread
+@@ -152,6 +154,8 @@ typedef struct LinuxProcess_ {
+ 
+ }*/
+ 
++long long btime; /* semi-global */
++
+ ProcessFieldData Process_fields[] = {
+    [0] = { .name = "", .title = NULL, .description = NULL, .flags = 0, },
+    [PID] = { .name = "PID", .title = "    PID ", .description = "Process/thread ID", .flags = 0, },
+@@ -344,6 +348,13 @@ void LinuxProcess_writeField(Process* this, RichString* str, ProcessField field)
+    case STIME: Process_printTime(str, lp->stime); return;
+    case CUTIME: Process_printTime(str, lp->cutime); return;
+    case CSTIME: Process_printTime(str, lp->cstime); return;
++   case STARTTIME: {
++     struct tm date;
++     time_t starttimewall = btime + (lp->starttime / sysconf(_SC_CLK_TCK));
++     (void) localtime_r(&starttimewall, &date);
++     strftime(buffer, n, ((starttimewall > time(NULL) - 86400) ? "%R " : "%b%d "), &date);
++     break;
++   }
+    #ifdef HAVE_TASKSTATS
+    case RCHAR:  Process_colorNumber(str, lp->io_rchar, coloring); return;
+    case WCHAR:  Process_colorNumber(str, lp->io_wchar, coloring); return;
+@@ -428,6 +439,12 @@ long LinuxProcess_compare(const void* v1, const void* v2) {
+    case CUTIME: diff = p2->cutime - p1->cutime; goto test_diff;
+    case STIME:  diff = p2->stime - p1->stime; goto test_diff;
+    case CSTIME: diff = p2->cstime - p1->cstime; goto test_diff;
++   case STARTTIME: {
++      if (p1->starttime == p2->starttime)
++         return (p1->super.pid - p2->super.pid);
++      else
++         return (p1->starttime - p2->starttime);
++   }
+    #ifdef HAVE_TASKSTATS
+    case RCHAR:  diff = p2->io_rchar - p1->io_rchar; goto test_diff;
+    case WCHAR:  diff = p2->io_wchar - p1->io_wchar; goto test_diff;
+diff --git a/linux/LinuxProcess.h b/linux/LinuxProcess.h
+index d75fe89..6ce3037 100644
+--- a/linux/LinuxProcess.h
++++ b/linux/LinuxProcess.h
+@@ -98,6 +98,7 @@ typedef struct LinuxProcess_ {
+    long m_drs;
+    long m_lrs;
+    long m_dt;
++   unsigned long long starttime;
+    #ifdef HAVE_TASKSTATS
+    unsigned long long io_rchar;
+    unsigned long long io_wchar;
+@@ -143,6 +144,8 @@ typedef struct LinuxProcess_ {
+ #endif
+ 
+ 
++long long btime; /* semi-global */
++
+ extern ProcessFieldData Process_fields[];
+ 
+ extern ProcessPidColumn Process_pidColumns[];
+diff --git a/linux/LinuxProcessList.c b/linux/LinuxProcessList.c
+index 2edd042..5f38540 100644
+--- a/linux/LinuxProcessList.c
++++ b/linux/LinuxProcessList.c
+@@ -47,6 +47,8 @@ in the source distribution for its full text.
+ 
+ #include "ProcessList.h"
+ 
++extern long long btime;
++
+ typedef struct CPUData_ {
+    unsigned long long int totalTime;
+    unsigned long long int userTime;
+@@ -111,7 +113,7 @@ typedef struct LinuxProcessList_ {
+ #endif
+ 
+ #ifndef PROC_LINE_LENGTH
+-#define PROC_LINE_LENGTH 512
++#define PROC_LINE_LENGTH 4096
+ #endif
+ 
+ }*/
+@@ -230,8 +232,8 @@ static void LinuxProcessList_initNetlinkSocket(LinuxProcessList* this) {
+ ProcessList* ProcessList_new(UsersTable* usersTable, Hashtable* pidWhiteList, uid_t userId) {
+    LinuxProcessList* this = xCalloc(1, sizeof(LinuxProcessList));
+    ProcessList* pl = &(this->super);
++
+    ProcessList_init(pl, Class(LinuxProcess), usersTable, pidWhiteList, userId);
+-   
+    LinuxProcessList_initTtyDrivers(this);
+ 
+    #ifdef HAVE_DELAYACCT
+@@ -243,13 +245,19 @@ ProcessList* ProcessList_new(UsersTable* usersTable, Hashtable* pidWhiteList, ui
+    if (file == NULL) {
+       CRT_fatalError("Cannot open " PROCSTATFILE);
+    }
+-   char buffer[PROC_LINE_LENGTH + 1];
+-   int cpus = -1;
++   int cpus = 0;
+    do {
+-      cpus++;
+-      char * s = fgets(buffer, PROC_LINE_LENGTH, file);
+-      (void) s;
+-   } while (String_startsWith(buffer, "cpu"));
++      char buffer[PROC_LINE_LENGTH + 1];
++      if (fgets(buffer, PROC_LINE_LENGTH + 1, file) == NULL) {
++         CRT_fatalError("No btime in " PROCSTATFILE);
++      } else if (String_startsWith(buffer, "cpu")) {
++         cpus++;
++      } else if (String_startsWith(buffer, "btime ")) {
++         sscanf(buffer, "btime %lld\n", &btime);
++         break;
++      }
++   } while(true);
++
+    fclose(file);
+ 
+    pl->cpuCount = MAX(cpus - 1, 1);
+@@ -259,7 +267,6 @@ ProcessList* ProcessList_new(UsersTable* usersTable, Hashtable* pidWhiteList, ui
+       this->cpus[i].totalTime = 1;
+       this->cpus[i].totalPeriod = 1;
+    }
+-
+    return pl;
+ }
+ 
+@@ -355,7 +362,10 @@ static bool LinuxProcessList_readStatFile(Process *process, const char* dirname,
+    location += 1;
+    process->nlwp = strtol(location, &location, 10);
+    location += 1;
+-   for (int i=0; i<17; i++) location = strchr(location, ' ')+1;
++   location = strchr(location, ' ')+1;
++   lp->starttime = strtoll(location, &location, 10);
++   location += 1;
++   for (int i=0; i<15; i++) location = strchr(location, ' ')+1;
+    process->exit_signal = strtol(location, &location, 10);
+    location += 1;
+    assert(location != NULL);
+@@ -367,7 +377,7 @@ static bool LinuxProcessList_readStatFile(Process *process, const char* dirname,
+ }
+ 
+ 
+-static bool LinuxProcessList_statProcessDir(Process* process, const char* dirname, char* name, time_t curTime) {
++static bool LinuxProcessList_statProcessDir(Process* process, const char* dirname, char* name) {
+    char filename[MAX_NAME+1];
+    filename[MAX_NAME] = '\0';
+ 
+@@ -377,13 +387,6 @@ static bool LinuxProcessList_statProcessDir(Process* process, const char* dirnam
+    if (statok == -1)
+       return false;
+    process->st_uid = sstat.st_uid;
+-  
+-   struct tm date;
+-   time_t ctime = sstat.st_ctime;
+-   process->starttime_ctime = ctime;
+-   (void) localtime_r((time_t*) &ctime, &date);
+-   strftime(process->starttime_show, 7, ((ctime > curTime - 86400) ? "%R " : "%b%d "), &date);
+-   
+    return true;
+ }
+ 
+@@ -709,7 +712,7 @@ static bool LinuxProcessList_readCmdlineFile(Process* process, const char* dirna
+    }
+    command[lastChar + 1] = '\0';
+    process->basenameOffset = tokenEnd;
+-   setCommand(process, command, lastChar);
++   setCommand(process, command, lastChar + 1);
+ 
+    return true;
+ }
+@@ -762,7 +765,6 @@ static bool LinuxProcessList_recurseProcTree(LinuxProcessList* this, const char*
+    struct dirent* entry;
+    Settings* settings = pl->settings;
+ 
+-   time_t curTime = tv.tv_sec;
+    #ifdef HAVE_TASKSTATS
+    unsigned long long now = tv.tv_sec*1000LL+tv.tv_usec/1000LL;
+    #endif
+@@ -834,7 +836,7 @@ static bool LinuxProcessList_recurseProcTree(LinuxProcessList* this, const char*
+ 
+       if(!preExisting) {
+ 
+-         if (! LinuxProcessList_statProcessDir(proc, dirname, name, curTime))
++         if (! LinuxProcessList_statProcessDir(proc, dirname, name))
+             goto errorReadingProcess;
+ 
+          proc->user = UsersTable_getRef(pl->usersTable, proc->st_uid);
+@@ -925,30 +927,30 @@ static inline void LinuxProcessList_scanMemoryInfo(ProcessList* this) {
+    char buffer[128];
+    while (fgets(buffer, 128, file)) {
+ 
+-      #define tryRead(label, variable) (String_startsWith(buffer, label) && sscanf(buffer + strlen(label), " %32llu kB", variable))
++      #define tryRead(label, variable) do { if (String_startsWith(buffer, label) && sscanf(buffer + strlen(label), " %32llu kB", variable)) { break; } } while(0)
+       switch (buffer[0]) {
+       case 'M':
+-         if (tryRead("MemTotal:", &this->totalMem)) {}
+-         else if (tryRead("MemFree:", &this->freeMem)) {}
+-         else if (tryRead("MemShared:", &this->sharedMem)) {}
++         tryRead("MemTotal:", &this->totalMem);
++         tryRead("MemFree:", &this->freeMem);
++         tryRead("MemShared:", &this->sharedMem);
+          break;
+       case 'B':
+-         if (tryRead("Buffers:", &this->buffersMem)) {}
++         tryRead("Buffers:", &this->buffersMem);
+          break;
+       case 'C':
+-         if (tryRead("Cached:", &this->cachedMem)) {}
++         tryRead("Cached:", &this->cachedMem);
+          break;
+       case 'S':
+          switch (buffer[1]) {
+          case 'w':
+-            if (tryRead("SwapTotal:", &this->totalSwap)) {}
+-            else if (tryRead("SwapFree:", &swapFree)) {}
++            tryRead("SwapTotal:", &this->totalSwap);
++            tryRead("SwapFree:", &swapFree);
+             break;
+          case 'h':
+-            if (tryRead("Shmem:", &shmem)) {}
++            tryRead("Shmem:", &shmem);
+             break;
+          case 'R':
+-            if (tryRead("SReclaimable:", &sreclaimable)) {}
++            tryRead("SReclaimable:", &sreclaimable);
+             break;
+          }
+          break;
+diff --git a/linux/LinuxProcessList.h b/linux/LinuxProcessList.h
+index 0851a10..f30b487 100644
+--- a/linux/LinuxProcessList.h
++++ b/linux/LinuxProcessList.h
+@@ -20,6 +20,8 @@ in the source distribution for its full text.
+ 
+ #include "ProcessList.h"
+ 
++extern long long btime;
++
+ typedef struct CPUData_ {
+    unsigned long long int totalTime;
+    unsigned long long int userTime;
+@@ -84,7 +86,7 @@ typedef struct LinuxProcessList_ {
+ #endif
+ 
+ #ifndef PROC_LINE_LENGTH
+-#define PROC_LINE_LENGTH 512
++#define PROC_LINE_LENGTH 4096
+ #endif
+ 
+ 
+diff --git a/openbsd/OpenBSDProcessList.c b/openbsd/OpenBSDProcessList.c
+index 14d9c2d..e49cbd7 100644
+--- a/openbsd/OpenBSDProcessList.c
++++ b/openbsd/OpenBSDProcessList.c
+@@ -223,6 +223,8 @@ void ProcessList_goThroughEntries(ProcessList* this) {
+    bool preExisting;
+    Process* proc;
+    OpenBSDProcess* fp;
++   struct tm date;
++   struct timeval tv;
+    int count = 0;
+    int i;
+ 
+@@ -232,6 +234,8 @@ void ProcessList_goThroughEntries(ProcessList* this) {
+    struct kinfo_proc* kprocs = kvm_getprocs(opl->kd, KERN_PROC_ALL, 0, sizeof(struct kinfo_proc), &count);
+    //struct kinfo_proc* kprocs = getprocs(KERN_PROC_ALL, 0, &count);
+ 
++   gettimeofday(&tv, NULL);
++
+    for (i = 0; i < count; i++) {
+       kproc = &kprocs[i];
+ 
+@@ -254,6 +258,8 @@ void ProcessList_goThroughEntries(ProcessList* this) {
+          proc->user = UsersTable_getRef(this->usersTable, proc->st_uid);
+          ProcessList_add((ProcessList*)this, proc);
+          proc->comm = OpenBSDProcessList_readProcessName(opl->kd, kproc, &proc->basenameOffset);
++         (void) localtime_r((time_t*) &kproc->p_ustart_sec, &date);
++         strftime(proc->starttime_show, 7, ((proc->starttime_ctime > tv.tv_sec - 86400) ? "%R " : "%b%d "), &date);
+       } else {
+          if (settings->updateProcessNames) {
+             free(proc->comm);
+diff --git a/openbsd/Platform.c b/openbsd/Platform.c
+index 01b6c47..4bb2e35 100644
+--- a/openbsd/Platform.c
++++ b/openbsd/Platform.c
+@@ -23,6 +23,7 @@ in the source distribution for its full text.
+ #include <sys/sched.h>
+ #include <uvm/uvmexp.h>
+ #include <sys/param.h>
++#include <sys/sysctl.h>
+ #include <sys/swap.h>
+ 
+ #include <unistd.h>
+@@ -34,6 +35,9 @@ in the source distribution for its full text.
+ #include <sys/time.h>
+ #include <sys/resource.h>
+ #include <time.h>
++#include <fcntl.h>
++#include <kvm.h>
++#include <limits.h>
+ 
+ /*{
+ #include "Action.h"
+@@ -294,6 +298,48 @@ void Platform_setTasksValues(Meter* this) {
+ }
+ 
+ char* Platform_getProcessEnv(pid_t pid) {
+-   // TODO
+-   return NULL;
++   char errbuf[_POSIX2_LINE_MAX];
++   char *env;
++   char **ptr;
++   int count;
++   kvm_t *kt;
++   struct kinfo_proc *kproc;
++   size_t capacity = 4096, size = 0;
++
++   if ((kt = kvm_openfiles(NULL, NULL, NULL, KVM_NO_FILES, errbuf)) == NULL)
++      return NULL;
++
++   if ((kproc = kvm_getprocs(kt, KERN_PROC_PID, pid,
++                             sizeof(struct kinfo_proc), &count)) == NULL) {\
++      (void) kvm_close(kt);
++      return NULL;
++   }
++
++   if ((ptr = kvm_getenvv(kt, kproc, 0)) == NULL) {
++      (void) kvm_close(kt);
++      return NULL;
++   }
++
++   env = xMalloc(capacity);
++   for (char **p = ptr; *p; p++) {
++      size_t len = strlen(*p) + 1;
++
++      if (size + len > capacity) {
++         capacity *= 2;
++         env = xRealloc(env, capacity);
++      }
++
++      strlcpy(env + size, *p, len);
++      size += len;
++   }
++
++   if (size < 2 || env[size - 1] || env[size - 2]) {
++       if (size + 2 < capacity)
++           env = xRealloc(env, capacity + 2);
++       env[size] = 0;
++       env[size+1] = 0;
++   }
++
++   (void) kvm_close(kt);
++   return env;
+ }
+diff --git a/scripts/MakeHeader.py b/scripts/MakeHeader.py
+index 7c48fdd..349531b 100755
+--- a/scripts/MakeHeader.py
++++ b/scripts/MakeHeader.py
+@@ -3,7 +3,7 @@ import os, sys, string, io
+ try:
+    from StringIO import StringIO
+ except ImportError:
+-   from io import StringIO
++   StringIO = io.StringIO
+ 
+ ANY=1
+ COPY=2

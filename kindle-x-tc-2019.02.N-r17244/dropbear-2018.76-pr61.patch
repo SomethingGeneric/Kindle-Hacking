@@ -1,0 +1,24 @@
+diff --git a/netio.c b/netio.c
+index 3cd7b5e..c02e031 100644
+--- a/netio.c
++++ b/netio.c
+@@ -374,9 +374,19 @@ void set_sock_priority(int sock, enum dropbear_prio prio) {
+ 	/* set the TOS bit for either ipv4 or ipv6 */
+ #ifdef IPTOS_LOWDELAY
+ 	if (prio == DROPBEAR_PRIO_LOWDELAY) {
++		#ifdef IPTOS_DSCP_AF21
++		iptos_val = IPTOS_DSCP_AF21;
++		#else
+ 		iptos_val = IPTOS_LOWDELAY;
++		#endif
+ 	} else if (prio == DROPBEAR_PRIO_BULK) {
++		#ifdef IPTOS_CLASS_CS1
++		iptos_val = IPTOS_CLASS_CS1;
++		#elif defined(IPTOS_DSCP_CS1)
++		iptos_val = IPTOS_DSCP_CS1;
++		#else
+ 		iptos_val = IPTOS_THROUGHPUT;
++		#endif
+ 	}
+ #if defined(IPPROTO_IPV6) && defined(IPV6_TCLASS)
+ 	rc = setsockopt(sock, IPPROTO_IPV6, IPV6_TCLASS, (void*)&iptos_val, sizeof(iptos_val));

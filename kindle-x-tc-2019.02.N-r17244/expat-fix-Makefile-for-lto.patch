@@ -1,0 +1,16 @@
+diff -Nuarp expat-2.1.1-ori/Makefile.in expat-2.1.1/Makefile.in
+--- expat-2.1.1-ori/Makefile.in	2016-03-12 04:21:09.000000000 +0100
++++ expat-2.1.1/Makefile.in	2016-03-14 03:50:40.971576455 +0100
+@@ -121,9 +121,9 @@ LTFLAGS = --verbose
+ COMPILE = $(CC) $(INCLUDES) $(CFLAGS) $(DEFS) $(CPPFLAGS)
+ CXXCOMPILE = $(CXX) $(INCLUDES) $(CXXFLAGS) $(DEFS) $(CPPFLAGS)
+ LTCOMPILE = $(LIBTOOL) $(LTFLAGS) --mode=compile $(COMPILE)
+-LINK_LIB = $(LIBTOOL) $(LTFLAGS) --mode=link $(COMPILE) -no-undefined $(VSNFLAG) -rpath $(libdir) $(LDFLAGS) -o $@
+-LINK_EXE = $(LIBTOOL) $(LTFLAGS) --mode=link $(COMPILE) $(LDFLAGS) -o $@
+-LINK_CXX_EXE = $(LIBTOOL) $(LTFLAGS) --mode=link $(CXXCOMPILE) $(LDFLAGS) -o $@
++LINK_LIB = $(LIBTOOL) $(LTFLAGS) --mode=link $(COMPILE) $(XC_LINKTOOL_CFLAGS) -no-undefined $(VSNFLAG) -rpath $(libdir) $(LDFLAGS) -o $@
++LINK_EXE = $(LIBTOOL) $(LTFLAGS) --mode=link $(COMPILE) $(XC_LINKTOOL_CFLAGS) $(LDFLAGS) -o $@
++LINK_CXX_EXE = $(LIBTOOL) $(LTFLAGS) --mode=link $(CXXCOMPILE) $(XC_LINKTOOL_CFLAGS) $(LDFLAGS) -o $@
+ 
+ LIB_OBJS = lib/xmlparse.lo lib/xmltok.lo lib/xmlrole.lo
+ $(LIBRARY): $(LIB_OBJS)

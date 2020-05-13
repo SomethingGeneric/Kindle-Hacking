@@ -1,0 +1,60 @@
+diff --git a/include/libunwind_i.h b/include/libunwind_i.h
+index e0f4540..de9342c 100644
+--- a/include/libunwind_i.h
++++ b/include/libunwind_i.h
+@@ -64,6 +64,29 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+ # error Could not locate <elf.h>
+ #endif
+ 
++// Our target glibc is too old to supply these...
++#define SHF_COMPRESSED       (1 << 11)  /* Section with compressed data. */
++
++/* Section compression header.  Used when SHF_COMPRESSED is set.  */
++typedef struct
++{
++  Elf32_Word    ch_type;        /* Compression format.  */
++  Elf32_Word    ch_size;        /* Uncompressed data size.  */
++  Elf32_Word    ch_addralign;   /* Uncompressed data alignment.  */
++} Elf32_Chdr;
++
++typedef struct
++{
++  Elf64_Word    ch_type;        /* Compression format.  */
++  Elf64_Word    ch_reserved;
++  Elf64_Xword   ch_size;        /* Uncompressed data size.  */
++  Elf64_Xword   ch_addralign;   /* Uncompressed data alignment.  */
++} Elf64_Chdr;
++
++/* Legal values for ch_type (compression algorithm).  */
++#define ELFCOMPRESS_ZLIB        1          /* ZLIB/DEFLATE algorithm.  */
++
++
+ #if defined(HAVE_ENDIAN_H)
+ # include <endian.h>
+ #elif defined(HAVE_SYS_ENDIAN_H)
+diff --git a/src/arm/Gtrace.c b/src/arm/Gtrace.c
+index 2f27752..c6678ea 100644
+--- a/src/arm/Gtrace.c
++++ b/src/arm/Gtrace.c
+@@ -27,6 +27,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+ #include "unwind_i.h"
+ #include "offsets.h"
+ #include <signal.h>
++#include <stdio.h>
+ #include <limits.h>
+ 
+ #pragma weak pthread_once
+diff --git a/src/arm/unwind_i.h b/src/arm/unwind_i.h
+index fe0bca0..239ae58 100644
+--- a/src/arm/unwind_i.h
++++ b/src/arm/unwind_i.h
+@@ -32,7 +32,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+ #include "libunwind_i.h"
+ 
+ /* DWARF column numbers for ARM: */
++#ifndef R7
+ #define R7      7
++#endif
+ #define SP      13
+ #define LR      14
+ #define PC      15

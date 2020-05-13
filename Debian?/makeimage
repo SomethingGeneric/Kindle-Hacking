@@ -1,0 +1,16 @@
+# make an ext3 disk image and mount it on sheeva (the donor machine)
+# this one is quite a large image... you may want less...
+# DO NOT use ext2 -- it won't work
+dd if=/dev/zero of=/tmp/debian.ext3 bs=1M count=1280
+mkfs.ext3 /tmp/debian.ext3
+tune2fs -i 0 -c 0 /tmp/debian.ext3
+
+mkdir /mnt/debian
+
+mount -o loop -t ext3 /tmp/debian.ext3 /mnt/debian
+
+# debootstrap a basic debian on to your image
+debootstrap --arch=armel testing /mnt/debian http://ftp.us.debian.org/debian
+
+umount /mnt/debian
+echo "Image done & @ /tmp/debian.ext3"

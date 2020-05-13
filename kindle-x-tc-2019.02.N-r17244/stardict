@@ -1,0 +1,37 @@
+
+
+ex /usr/portage/distfiles/readline-6.2.tar.gz
+patch -p0 < /usr/portage/distfiles/readline62-001
+patch -p0 < /usr/portage/distfiles/readline62-002
+patch -p0 < /usr/portage/distfiles/readline62-003
+patch -p0 < /usr/portage/distfiles/readline62-004
+patch -p0 < /usr/portage/sys-libs/readline/files/readline-5.0-no_rpath.patch
+patch -p0 < /usr/portage/sys-libs/readline/files/readline-5.2-no-ignore-shlib-errors.patch
+sed -i -e 's:^SHLIB_LIBS=:SHLIB_LIBS=-lncurses:' support/shobj-conf
+ln -s ../.. examples/rlfe/readline
+export CPPFLAGS="${BASE_CPPFLAGS} -D_GNU_SOURCE -Dxrealloc=_rl_realloc -Dxmalloc=_rl_malloc -Dxfree=_rl_free"
+export LDFLAGS="${BASE_LDFLAGS} -L."
+./configure --prefix=${TC_BUILD_DIR} --host=${CROSS_TC} --enable-shared=no --enable-static=yes
+export LDFLAGS="${BASE_LDFLAGS}"
+export CPPFLAGS="${BASE_CPPFLAGS}"
+
+
+svn checkout svn://svn.code.sf.net/p/sdcv/code/trunk sdcv-code
+cd sdcv-code
+mkdir build
+cd build
+export CFLAGS="${BASE_CFLAGS} -I ${TC_BUILD_DIR}/include"
+export CXXFLAGS="${BASE_CXXFLAGS} -I ${TC_BUILD_DIR}/include"
+export LDFLAGS="${BASE_LDFLAGS} -static-libstdc++"
+cmake -DCMAKE_C_COMPILER=${CROSS_TC}-gcc -DCMAKE_CXX_COMPILER=${CROSS_TC}-g++ -DCMAKE_BUILD_TYPE="Release" -DCMAKE_INSTALL_PREFIX="${TC_BUILD_DIR}" -DENABLE_NLS=OFF -DREADLINE_INCLUDE_DIR="${TC_BUILD_DIR}/include" -DREADLINE_LIBRARY="${TC_BUILD_DIR}/lib/libreadline.a" ..
+# Ninja a -lncurses in to link agaisnt a static readline...
+sed -e 's/libreadline.a/libreadline.a -lncurses/' -i ./CMakeFiles/sdcv.dir/link.txt
+make -j2 VERBOSE=1
+make install
+${CROSS_TC}-strip --strip-unneeded ../../bin/sdcv
+export LDFLAGS="${BASE_LDFLAGS}"
+export CXXFLAGS="${BASE_CXXFLAGS}"
+export CFLAGS="${BASE_CFLAGS}"
+
+
+hg clone https://code.google.com/p/stardict-3/

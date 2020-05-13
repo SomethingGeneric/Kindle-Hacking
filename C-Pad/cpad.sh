@@ -12,7 +12,7 @@ while true
 do
 
 
-printf ">"
+printf "> "
 read inp
 
 if [ $inp = "exit" ]

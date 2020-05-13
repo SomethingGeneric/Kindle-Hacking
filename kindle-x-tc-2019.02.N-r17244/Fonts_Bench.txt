@@ -1,0 +1,276 @@
+$Id: Fonts_Bench.txt 8172 2012-06-15 02:15:55Z NiLuJe $
+
+Small ftbench run on Museo Slab 500 (OTF), as of right now (Fonts v4.9.N), with the BCI FT override, on a Kindle 3G.
+It seems to ever so sliiightly back my feeling that the O2 builds perform better/faster than O3, and leave the default libs in the dust.
+The delta between O2 and O3 is pretty insignificant anyway, and the O2 builds have the added advantage of being smaller, so, there. :D
+
+(Lower is better)
+
+* -O2 -ffast-math :
+
+[root@kindle root]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 220.100 us/op
+Load_Advances (Normal)    : 61.499 us/op
+Load_Advances (Fast)      : 57.420 us/op
+Render                    : 64.246 us/op
+Get_Glyph                 : 18.710 us/op
+Get_CBox                  : 5.172 us/op
+Get_Char_Index            : 0.473 us/op
+Iterate CMap              : 112.845 us/op
+New_Face                  : 11987.759 us/op
+Embolden                  : 3.505 us/op
+[root@kindle root]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 218.381 us/op
+Load_Advances (Normal)    : 60.837 us/op
+Load_Advances (Fast)      : 56.909 us/op
+Render                    : 64.599 us/op
+Get_Glyph                 : 18.814 us/op
+Get_CBox                  : 5.235 us/op
+Get_Char_Index            : 0.473 us/op
+Iterate CMap              : 112.590 us/op
+New_Face                  : 11967.483 us/op
+Embolden                  : 3.550 us/op
+[root@kindle root]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 218.059 us/op
+Load_Advances (Normal)    : 60.676 us/op
+Load_Advances (Fast)      : 56.630 us/op
+Render                    : 64.461 us/op
+Get_Glyph                 : 18.895 us/op
+Get_CBox                  : 5.191 us/op
+Get_Char_Index            : 0.473 us/op
+Iterate CMap              : 112.510 us/op
+New_Face                  : 11963.272 us/op
+Embolden                  : 3.519 us/op
+[root@kindle root]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 221.065 us/op
+Load_Advances (Normal)    : 60.902 us/op
+Load_Advances (Fast)      : 56.895 us/op
+Render                    : 64.654 us/op
+Get_Glyph                 : 18.949 us/op
+Get_CBox                  : 5.304 us/op
+Get_Char_Index            : 0.473 us/op
+Iterate CMap              : 112.432 us/op
+New_Face                  : 11986.466 us/op
+Embolden                  : 3.652 us/op
+[root@kindle root]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 218.389 us/op
+Load_Advances (Normal)    : 60.729 us/op
+Load_Advances (Fast)      : 56.716 us/op
+Render                    : 64.559 us/op
+Get_Glyph                 : 18.862 us/op
+Get_CBox                  : 5.187 us/op
+Get_Char_Index            : 0.473 us/op
+Iterate CMap              : 112.420 us/op
+New_Face                  : 12007.371 us/op
+Embolden                  : 3.539 us/op
+
+
+* -Ofast :
+
+[root@kindle root]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 219.127 us/op
+Load_Advances (Normal)    : 62.523 us/op
+Load_Advances (Fast)      : 56.947 us/op
+Render                    : 66.641 us/op
+Get_Glyph                 : 19.720 us/op
+Get_CBox                  : 5.467 us/op
+Get_Char_Index            : 0.485 us/op
+Iterate CMap              : 113.386 us/op
+New_Face                  : 12007.959 us/op
+Embolden                  : 3.648 us/op
+[root@kindle root]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 219.442 us/op
+Load_Advances (Normal)    : 62.104 us/op
+Load_Advances (Fast)      : 57.993 us/op
+Render                    : 65.955 us/op
+Get_Glyph                 : 19.924 us/op
+Get_CBox                  : 5.413 us/op
+Get_Char_Index            : 0.486 us/op
+Iterate CMap              : 113.384 us/op
+New_Face                  : 12050.859 us/op
+Embolden                  : 3.614 us/op
+[root@kindle root]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 221.040 us/op
+Load_Advances (Normal)    : 62.137 us/op
+Load_Advances (Fast)      : 59.139 us/op
+Render                    : 66.627 us/op
+Get_Glyph                 : 20.161 us/op
+Get_CBox                  : 5.593 us/op
+Get_Char_Index            : 0.486 us/op
+Iterate CMap              : 113.401 us/op
+New_Face                  : 12010.283 us/op
+Embolden                  : 3.656 us/op
+[root@kindle root]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 218.670 us/op
+Load_Advances (Normal)    : 61.286 us/op
+Load_Advances (Fast)      : 57.520 us/op
+Render                    : 66.623 us/op
+Get_Glyph                 : 19.680 us/op
+Get_CBox                  : 5.415 us/op
+Get_Char_Index            : 0.485 us/op
+Iterate CMap              : 113.734 us/op
+New_Face                  : 12026.058 us/op
+Embolden                  : 3.653 us/op
+[root@kindle root]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 222.212 us/op
+Load_Advances (Normal)    : 62.825 us/op
+Load_Advances (Fast)      : 58.623 us/op
+Render                    : 66.187 us/op
+Get_Glyph                 : 19.948 us/op
+Get_CBox                  : 5.488 us/op
+Get_Char_Index            : 0.486 us/op
+Iterate CMap              : 113.378 us/op
+New_Face                  : 12021.477 us/op
+Embolden                  : 3.611 us/op
+
+
+* Kindle 3.1:
+
+[root@kindle root]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 242.011 us/op
+Load_Advances (Normal)    : 71.750 us/op
+Load_Advances (Fast)      : 67.535 us/op
+Render                    : 79.694 us/op
+Get_Glyph                 : 23.895 us/op
+Get_CBox                  : 6.656 us/op
+Get_Char_Index            : 0.528 us/op
+Iterate CMap              : 118.457 us/op
+New_Face                  : 12611.599 us/op
+Embolden                  : 4.730 us/op
+[root@kindle root]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 240.588 us/op
+Load_Advances (Normal)    : 71.169 us/op
+Load_Advances (Fast)      : 67.291 us/op
+Render                    : 79.952 us/op
+Get_Glyph                 : 23.777 us/op
+Get_CBox                  : 6.657 us/op
+Get_Char_Index            : 0.529 us/op
+Iterate CMap              : 118.305 us/op
+New_Face                  : 12540.127 us/op
+Embolden                  : 4.731 us/op
+[root@kindle root]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 240.397 us/op
+Load_Advances (Normal)    : 71.399 us/op
+Load_Advances (Fast)      : 67.190 us/op
+Render                    : 79.626 us/op
+Get_Glyph                 : 23.544 us/op
+Get_CBox                  : 6.643 us/op
+Get_Char_Index            : 0.527 us/op
+Iterate CMap              : 118.589 us/op
+New_Face                  : 12580.059 us/op
+Embolden                  : 4.738 us/op
+[root@kindle root]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 243.390 us/op
+Load_Advances (Normal)    : 73.016 us/op
+Load_Advances (Fast)      : 68.957 us/op
+Render                    : 79.792 us/op
+Get_Glyph                 : 23.585 us/op
+Get_CBox                  : 6.708 us/op
+Get_Char_Index            : 0.528 us/op
+Iterate CMap              : 118.309 us/op
+New_Face                  : 12581.513 us/op
+Embolden                  : 4.802 us/op
+[root@kindle root]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 242.159 us/op
+Load_Advances (Normal)    : 72.049 us/op
+Load_Advances (Fast)      : 67.990 us/op
+Render                    : 79.782 us/op
+Get_Glyph                 : 23.718 us/op
+Get_CBox                  : 6.603 us/op
+Get_Char_Index            : 0.527 us/op
+Iterate CMap              : 118.293 us/op
+New_Face                  : 12558.207 us/op
+Embolden                  : 4.740 us/op
+
+
+-----
+
+                               O3                O2            3.1         Speedup (3.1 -> O2) [  xO2=218.8758; xOR=241.709; echo $(( ((xO2 - xOR) / xOR) * 100 ))  ]
+
+Load                      : 220,0982     :  219,1988    :   241,709     :   9,31%
+Load_Advances (Normal)    : 62,175       :  60,9286     :   71,8766     :  15,23%
+Load_Advances (Fast)      : 58,0444      :  56,914      :   67,7926     :  16,05%
+Render                    : 66,4066      :  64,5038     :   79,7692     :  19,14%
+Get_Glyph                 : 19,8866      :  18,846      :   23,7038     :  20,49%
+Get_CBox                  : 5,4752       :  5,2178      :   6,6534      :  21,58%
+Get_Char_Index            : 0,4856       :  0,473       :   0,5278      :  10,38%
+Iterate CMap              : 113,4566     :  112,5594    :   118,3906    :   4,93%
+New_Face                  : 12 023,3272  :  11 982,4702 :   12 574,301  :   4,71%
+Embolden                  : 3,6364       :  3,553       :   4,7482      :  25,17%
+TOTAL                     : 12 572,9918  :  12 524,6646 :   13 189,4722 :   5,04%
+
+
+-----
+
+Quick hardf/softfp check, since I've switched to softfp in 5.1.N... (Doesn't seem to impact performance that much, cool!)
+
+5.0 (hardf):
+[root@kindle kindlepdfviewer]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 227.276 us/op
+Load_Advances (Normal)    : 64.510 us/op
+Load_Advances (Fast)      : 59.860 us/op
+Render                    : 66.568 us/op
+Get_Glyph                 : 20.489 us/op
+Get_CBox                  : 5.328 us/op
+Get_Char_Index            : 0.480 us/op
+Iterate CMap              : 113.152 us/op
+New_Face                  : 11996.648 us/op
+Embolden                  : 3.516 us/op
+[root@kindle kindlepdfviewer]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 225.943 us/op
+Load_Advances (Normal)    : 63.806 us/op
+Load_Advances (Fast)      : 59.177 us/op
+Render                    : 66.617 us/op
+Get_Glyph                 : 20.369 us/op
+Get_CBox                  : 5.372 us/op
+Get_Char_Index            : 0.480 us/op
+Iterate CMap              : 113.126 us/op
+New_Face                  : 11998.098 us/op
+Embolden                  : 3.547 us/op
+[root@kindle kindlepdfviewer]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 224.608 us/op
+Load_Advances (Normal)    : 63.221 us/op
+Load_Advances (Fast)      : 58.770 us/op
+Render                    : 65.714 us/op
+Get_Glyph                 : 20.321 us/op
+Get_CBox                  : 5.333 us/op
+Get_Char_Index            : 0.480 us/op
+Iterate CMap              : 113.127 us/op
+New_Face                  : 11984.985 us/op
+Embolden                  : 3.504 us/op
+
+5.1 (softfp):
+[root@kindle kindlepdfviewer]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 223.703 us/op
+Load_Advances (Normal)    : 60.929 us/op
+Load_Advances (Fast)      : 57.670 us/op
+Render                    : 64.110 us/op
+Get_Glyph                 : 18.511 us/op
+Get_CBox                  : 3.912 us/op
+Get_Char_Index            : 0.473 us/op
+Iterate CMap              : 112.734 us/op
+New_Face                  : 12242.563 us/op
+Embolden                  : 2.187 us/op
+[root@kindle kindlepdfviewer]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 222.538 us/op
+Load_Advances (Normal)    : 61.297 us/op
+Load_Advances (Fast)      : 58.167 us/op
+Render                    : 65.070 us/op
+Get_Glyph                 : 18.573 us/op
+Get_CBox                  : 3.995 us/op
+Get_Char_Index            : 0.473 us/op
+Iterate CMap              : 112.764 us/op
+New_Face                  : 12301.790 us/op
+Embolden                  : 2.218 us/op
+[root@kindle kindlepdfviewer]# /mnt/us/usbnet/bin/ftbench /usr/java/lib/fonts/Serif_Regular.ttf
+Load                      : 221.793 us/op
+Load_Advances (Normal)    : 61.368 us/op
+Load_Advances (Fast)      : 58.048 us/op
+Render                    : 64.211 us/op
+Get_Glyph                 : 18.566 us/op
+Get_CBox                  : 3.963 us/op
+Get_Char_Index            : 0.473 us/op
+Iterate CMap              : 112.775 us/op
+New_Face                  : 12305.973 us/op
+Embolden                  : 2.217 us/op
+

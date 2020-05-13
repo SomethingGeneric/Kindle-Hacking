@@ -1,0 +1,16 @@
+diff --git a/MagickCore/quantize.c b/MagickCore/quantize.c
+index f4bc0e6b0..b707624a0 100644
+--- a/MagickCore/quantize.c
++++ b/MagickCore/quantize.c
+@@ -205,11 +205,7 @@
+ /*
+   Define declarations.
+ */
+-#if !defined(__APPLE__) && !defined(TARGET_OS_IPHONE)
+-#define CacheShift  2
+-#else
+ #define CacheShift  3
+-#endif
+ #define ErrorQueueLength  16
+ #define MaxNodes  266817
+ #define MaxTreeDepth  8

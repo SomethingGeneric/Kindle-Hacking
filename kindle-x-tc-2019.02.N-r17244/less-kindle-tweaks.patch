@@ -1,0 +1,15 @@
+diff --git a/main.c b/main.c
+index c729ec8..a11c60b 100644
+--- a/main.c
++++ b/main.c
+@@ -102,6 +102,10 @@ main(argc, argv)
+ 	GetConsoleTitle(consoleTitle, sizeof(consoleTitle)/sizeof(char));
+ #endif /* WIN32 */
+ 
++	setenv("TERMINFO", "/mnt/us/usbnet/etc/terminfo", 1);
++	setenv("HOME", "/mnt/us/usbnet/etc", 1);
++	setenv("LESSECHO", "/mnt/us/usbnet/bin/lessecho", 1);
++
+ 	/*
+ 	 * Process command line arguments and LESS environment arguments.
+ 	 * Command line arguments override environment arguments.

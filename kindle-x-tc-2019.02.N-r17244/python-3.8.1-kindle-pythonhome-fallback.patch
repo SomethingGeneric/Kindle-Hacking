@@ -1,0 +1,15 @@
+diff --git a/Python/initconfig.c b/Python/initconfig.c
+index a30fdd1bab..3f59221098 100644
+--- a/Python/initconfig.c
++++ b/Python/initconfig.c
+@@ -1674,6 +1674,10 @@ config_read(PyConfig *config)
+         if (_PyStatus_EXCEPTION(status)) {
+             return status;
+         }
++        /* Fallback to a sane value for our Kindle if it's not set */
++        if (config->home == NULL) {
++            config->home = wcsdup(L"/mnt/us/python3");
++        }
+     }
+ 
+     if (config->executable == NULL) {

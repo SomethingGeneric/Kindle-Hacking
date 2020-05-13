@@ -1,0 +1,66 @@
+diff -Nuarp linux-2.6.26/include/linux/kindle_version.h linux-2.6.26-nil/include/linux/kindle_version.h
+--- linux-2.6.26/include/linux/kindle_version.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.26-nil/include/linux/kindle_version.h	2012-08-15 18:49:03.906923342 +0200
+@@ -0,0 +1,4 @@
++# ifndef __KINDLE_VERSION_H__
++# define __KINDLE_VERSION_H__
++# define VERSION_TAG "000000"
++# endif
+diff -Nuarp linux-2.6.26/Makefile linux-2.6.26-nil/Makefile
+--- linux-2.6.26/Makefile	2011-09-15 02:24:26.000000000 +0200
++++ linux-2.6.26-nil/Makefile	2012-08-15 18:49:03.907923329 +0200
+@@ -433,7 +433,10 @@ ifeq ($(config-targets),1)
+ include $(srctree)/arch/$(SRCARCH)/Makefile
+ export KBUILD_DEFCONFIG
+ 
+-config %config: scripts_basic outputmakefile FORCE
++config: scripts_basic outputmakefile FORCE
++	$(Q)mkdir -p include/linux include/config
++	$(Q)$(MAKE) $(build)=scripts/kconfig $@
++%config: scripts_basic outputmakefile FORCE
+ 	$(Q)mkdir -p include/linux include/config
+ 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
+ 
+@@ -1553,7 +1556,11 @@ endif
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+ 
+ # Modules
+-/ %/: prepare scripts FORCE
++/: prepare scripts FORCE
++	$(cmd_crmodverdir)
++	$(Q)$(MAKE) KBUILD_MODULES=$(if $(CONFIG_MODULES),1) \
++	$(build)=$(build-dir)
++%/: prepare scripts FORCE
+ 	$(cmd_crmodverdir)
+ 	$(Q)$(MAKE) KBUILD_MODULES=$(if $(CONFIG_MODULES),1) \
+ 	$(build)=$(build-dir)
+diff -Nuarp linux-2.6.26/scripts/unifdef.c linux-2.6.26-nil/scripts/unifdef.c
+--- linux-2.6.26/scripts/unifdef.c	2011-09-15 02:22:39.000000000 +0200
++++ linux-2.6.26-nil/scripts/unifdef.c	2012-08-15 18:49:10.348842807 +0200
+@@ -206,7 +206,7 @@ static void             done(void);
+ static void             error(const char *);
+ static int              findsym(const char *);
+ static void             flushline(bool);
+-static Linetype         getline(void);
++static Linetype         get_line(void);
+ static Linetype         ifeval(const char **);
+ static void             ignoreoff(void);
+ static void             ignoreon(void);
+@@ -512,7 +512,7 @@ process(void)
+ 
+ 	for (;;) {
+ 		linenum++;
+-		lineval = getline();
++		lineval = get_line();
+ 		trans_table[ifstate[depth]][lineval]();
+ 		debug("process %s -> %s depth %d",
+ 		    linetype_name[lineval],
+@@ -526,7 +526,7 @@ process(void)
+  * help from skipcomment().
+  */
+ static Linetype
+-getline(void)
++get_line(void)
+ {
+ 	const char *cp;
+ 	int cursym;

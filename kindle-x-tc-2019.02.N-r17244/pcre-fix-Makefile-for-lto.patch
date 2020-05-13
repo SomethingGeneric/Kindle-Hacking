@@ -1,0 +1,38 @@
+diff -Nuarp pcre-8.36-ori/Makefile.am pcre-8.36/Makefile.am
+--- pcre-8.36-ori/Makefile.am	2014-04-04 15:39:50.000000000 +0200
++++ pcre-8.36/Makefile.am	2015-03-06 20:19:31.185056099 +0100
+@@ -369,13 +369,13 @@ EXTRA_DIST += \
+   sljit/sljitUtils.c
+ 
+ if WITH_PCRE8
+-libpcre_la_LDFLAGS = $(EXTRA_LIBPCRE_LDFLAGS)
++libpcre_la_LDFLAGS = $(EXTRA_LIBPCRE_LDFLAGS) $(XC_LINKTOOL_CFLAGS)
+ endif # WITH_PCRE8
+ if WITH_PCRE16
+-libpcre16_la_LDFLAGS = $(EXTRA_LIBPCRE16_LDFLAGS)
++libpcre16_la_LDFLAGS = $(EXTRA_LIBPCRE16_LDFLAGS) $(XC_LINKTOOL_CFLAGS)
+ endif # WITH_PCRE16
+ if WITH_PCRE32
+-libpcre32_la_LDFLAGS = $(EXTRA_LIBPCRE32_LDFLAGS)
++libpcre32_la_LDFLAGS = $(EXTRA_LIBPCRE32_LDFLAGS) $(XC_LINKTOOL_CFLAGS)
+ endif # WITH_PCRE32
+ 
+ if WITH_VALGRIND
+@@ -433,7 +433,7 @@ lib_LTLIBRARIES += libpcreposix.la
+ libpcreposix_la_SOURCES = \
+   pcreposix.c
+ libpcreposix_la_CFLAGS = $(VISIBILITY_CFLAGS) $(AM_CFLAGS)
+-libpcreposix_la_LDFLAGS = $(EXTRA_LIBPCREPOSIX_LDFLAGS)
++libpcreposix_la_LDFLAGS = $(EXTRA_LIBPCREPOSIX_LDFLAGS) $(XC_LINKTOOL_CFLAGS)
+ libpcreposix_la_LIBADD = libpcre.la
+ 
+ if WITH_GCOV
+@@ -452,7 +452,7 @@ libpcrecpp_la_SOURCES = \
+   pcre_scanner.cc \
+   pcre_stringpiece.cc
+ libpcrecpp_la_CXXFLAGS = $(VISIBILITY_CXXFLAGS) $(AM_CXXFLAGS)
+-libpcrecpp_la_LDFLAGS = $(EXTRA_LIBPCRECPP_LDFLAGS)
++libpcrecpp_la_LDFLAGS = $(EXTRA_LIBPCRECPP_LDFLAGS) $(XC_LINKTOOL_CFLAGS)
+ libpcrecpp_la_LIBADD = libpcre.la
+ 
+ TESTS += pcrecpp_unittest

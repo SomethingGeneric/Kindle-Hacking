@@ -1,0 +1,14 @@
+diff --git a/src/nano.c b/src/nano.c
+index 51f98f45..a31a7341 100644
+--- a/src/nano.c
++++ b/src/nano.c
+@@ -1886,6 +1886,9 @@ int main(int argc, char **argv)
+ 		fcntl(0, F_SETFL, stdin_flags & ~O_NONBLOCK);
+ 
+ #ifdef ENABLE_UTF8
++	/* Kindle Hack: on some FW versions, non en_US locales are wonky, leading to regex errors... Enforce en_US */
++	setenv("LC_ALL", "en_US.UTF-8", 1);
++
+ 	/* If setting the locale is successful and it uses UTF-8, we need
+ 	 * to use the multibyte functions for text processing. */
+ 	if (setlocale(LC_ALL, "") != NULL &&

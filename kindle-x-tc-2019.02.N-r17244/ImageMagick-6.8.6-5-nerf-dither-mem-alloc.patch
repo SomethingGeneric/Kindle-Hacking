@@ -1,0 +1,15 @@
+diff -Nuarp ImageMagick-6.8.6-5-ori/magick/quantize.c ImageMagick-6.8.6-5/magick/quantize.c
+--- ImageMagick-6.8.6-5-ori/magick/quantize.c	2013-07-12 13:02:15.000000000 +0200
++++ ImageMagick-6.8.6-5/magick/quantize.c	2013-07-14 17:36:18.809705727 +0200
+@@ -202,11 +202,7 @@
+ /*
+   Define declarations.
+ */
+-#if !defined(__APPLE__) && !defined(TARGET_OS_IPHONE)
+-#define CacheShift  2
+-#else
+ #define CacheShift  3
+-#endif
+ #define ErrorQueueLength  16
+ #define MaxNodes  266817
+ #define MaxTreeDepth  8

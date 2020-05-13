@@ -1,0 +1,60 @@
+diff --git a/loginutils/login.c b/loginutils/login.c
+index a08642a..3cf7eb7 100644
+--- a/loginutils/login.c
++++ b/loginutils/login.c
+@@ -354,7 +354,7 @@ int login_main(int argc UNUSED_PARAM, char **argv)
+ 	 */
+ 	bb_daemon_helper(DAEMON_CLOSE_EXTRA_FDS);
+ 
+-	username[0] = '\0';
++	strcpy(username, "root");
+ 	opt = getopt32(argv, "f:h:p", &opt_user, &opt_host);
+ 	if (opt & LOGIN_OPT_f) {
+ 		if (!run_by_root)
+@@ -499,7 +499,7 @@ int login_main(int argc UNUSED_PARAM, char **argv)
+ 		 * Note that reads (in no-echo mode) trash tty attributes.
+ 		 * If we get interrupted by SIGALRM, we need to restore attrs.
+ 		 */
+-		if (ask_and_check_password(pw) > 0)
++		/* if (ask_and_check_password(pw) > 0) */
+ 			break;
+ #endif /* ENABLE_PAM */
+  auth_failed:
+diff --git a/loginutils/su.c b/loginutils/su.c
+index 41291ea..b456d1e 100644
+--- a/loginutils/su.c
++++ b/loginutils/su.c
+@@ -128,6 +128,7 @@ int su_main(int argc UNUSED_PARAM, char **argv)
+ 
+ 	pw = xgetpwnam(opt_username);
+ 
++	/*
+ 	r = 1;
+ 	if (cur_uid != 0)
+ 		r = ask_and_check_password(pw);
+@@ -149,6 +150,10 @@ int su_main(int argc UNUSED_PARAM, char **argv)
+ 		bb_do_delay(LOGIN_FAIL_DELAY);
+ 		bb_error_msg_and_die("incorrect password");
+ 	}
++	*/
++	if (ENABLE_FEATURE_SU_SYSLOG)
++		syslog(LOG_NOTICE, "%c %s %s:%s",
++				'+', tty, old_user, opt_username);
+ 
+ 	if (ENABLE_FEATURE_CLEAN_UP && ENABLE_FEATURE_SU_SYSLOG) {
+ 		closelog();
+diff --git a/networking/telnetd.c b/networking/telnetd.c
+index 6abecbd..f490e6d 100644
+--- a/networking/telnetd.c
++++ b/networking/telnetd.c
+@@ -159,8 +159,8 @@ struct globals {
+ #define G (*(struct globals*)bb_common_bufsiz1)
+ #define INIT_G() do { \
+ 	setup_common_bufsiz(); \
+-	G.loginpath = "/bin/login"; \
+-	G.issuefile = "/etc/issue.net"; \
++	G.loginpath = "login"; \
++	G.issuefile = "/etc/issue"; \
+ } while (0)
+ 
+ 

@@ -1,0 +1,1474 @@
+2020-05-01 21:37  NiLuJe
+
+	* [r17174] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2020-04-06 04:25  NiLuJe
+
+	* [r17028] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2020-03-10 15:28  NiLuJe
+
+	* [r16952] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2020-03-09 19:47  NiLuJe
+
+	* [r16935] src/install/bridge.conf:
+	  
+	  Kindle Hacks:
+	  * Bridge:
+	  * Minor review pass
+
+2020-03-08 18:26  NiLuJe
+
+	* [r16927] src/install/bridge.conf:
+	  
+	  JB:
+	  * Minor tweaks for consistency
+
+2020-03-08 18:23  NiLuJe
+
+	* [r16926] src/install/bridge.conf:
+	  
+	  Bridge Job:
+	  * Silence the expected warnings
+
+2020-03-08 17:40  NiLuJe
+
+	* [r16923] src/install/bridge.conf:
+	  
+	  Kindle Touch Hacks:
+	  * Be more aggressive when attempting to restore the bridge
+
+2020-03-08 04:41  NiLuJe
+
+	* [r16922] src/install/bridge.conf, src/touch/install/install-k5.sh:
+	  
+	  Kindle Touch Hacks:
+	  * JailBreak:
+	  * Double-check gandalf's permissions
+
+2020-03-08 01:24  NiLuJe
+
+	* [r16920] src/install/bridge.conf:
+	  
+	  Kindle Hacks:
+	  * Log the bridge revision
+
+2020-02-25 16:51  NiLuJe
+
+	* [r16904] src/install/bridge.conf:
+	  
+	  Kindle Touch Hacks:
+	  * Bridge:
+	  * You're our only hope, Obi Wan!
+
+2020-02-19 23:28  NiLuJe
+
+	* [r16889] src/install/bridge.conf:
+	  
+	  Kindle Hacks:
+	  * Bridge:
+	  * Be extremely paranoid.
+
+2020-02-19 23:17  NiLuJe
+
+	* [r16887] src/install/bridge.conf:
+	  
+	  Kindle Hacks:
+	  * Bridge Job:
+	  * It's not a plane! ;p
+
+2020-02-19 17:17  NiLuJe
+
+	* [r16875] src/install/bridge.conf:
+	  
+	  Kindle Touch Hacks:
+	  * Bridge:
+	  * Make the job chatty again
+
+2020-02-11 03:08  NiLuJe
+
+	* [r16858] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (fix gdb)
+
+2020-02-10 16:58  NiLuJe
+
+	* [r16851] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2020-02-04 18:01  NiLuJe
+
+	* [r16835] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-11-25 22:32  NiLuJe
+
+	* [r16737] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Update binaries
+
+2019-11-23 23:12  NiLuJe
+
+	* [r16715] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-11-14 23:29  NiLuJe
+
+	* [r16672] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries:
+	  * Fix some readline & Python 2 EoL shenanigans.
+
+2019-11-14 15:43  NiLuJe
+
+	* [r16658] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-10-11 21:21  NiLuJe
+
+	* [r16572] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-10-07 16:38  NiLuJe
+
+	* [r16543] src/install/bridge.conf:
+	  
+	  Kindle Touch Hacks:
+	  * Bridge:
+	  * Some more double-checks...
+
+2019-10-07 16:29  NiLuJe
+
+	* [r16540] src/install/bridge.conf:
+	  
+	  Kindle Touch Hacks:
+	  * Bridge:
+	  * Need to make sure the target exists, first.
+
+2019-10-07 16:27  NiLuJe
+
+	* [r16539] src/install/bridge.conf:
+	  
+	  Kindle Touch Hacks:
+	  * Bridge:
+	  * Well, that wasn't ever going to work as expected :D.
+
+2019-10-07 16:21  NiLuJe
+
+	* [r16538] src/install/bridge.conf:
+	  
+	  Kindle Touch Hacks:
+	  * Bridge:
+	  * Try harder to restore backups after a varlocal cleanup
+
+2019-10-06 19:37  NiLuJe
+
+	* [r16535] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-10-01 02:33  NiLuJe
+
+	* [r16517] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-09-15 22:01  NiLuJe
+
+	* [r16474] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-09-02 11:12  NiLuJe
+
+	* [r16438] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-08-14 18:50  NiLuJe
+
+	* [r16309] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (complete bs4 support)
+
+2019-08-14 11:31  NiLuJe
+
+	* [r16306] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-07-30 22:02  NiLuJe
+
+	* [r16286] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-07-20 15:56  NiLuJe
+
+	* [r16237] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-07-12 01:38  NiLuJe
+
+	* [r16157] build/build-updates.sh:
+	  
+	  Kindle Hacks:
+	  * Switch from hard copies to hard links for most move/copy operations
+	  in the packaging scripts.
+	  Should hopefully make rebuilding the snapshots a tiny bit faster with
+	  no adverse affects ;).
+
+2019-07-10 17:21  NiLuJe
+
+	* [r16139] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-07-07 03:50  NiLuJe
+
+	* [r16071] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-06-03 12:40  NiLuJe
+
+	* [r15983] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-04-30 14:17  NiLuJe
+
+	* [r15920] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-04-20 02:53  NiLuJe
+
+	* [r15898] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-04-06 05:00  NiLuJe
+
+	* [r15860] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-03-10 18:16  NiLuJe
+
+	* [r15828] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-02-21 16:49  NiLuJe
+
+	* [r15788] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2019-02-01 23:32  NiLuJe
+
+	* [r15759] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (TC update)
+
+2019-01-03 16:20  NiLuJe
+
+	* [r15706] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (fix wand)
+
+2019-01-03 04:29  NiLuJe
+
+	* [r15700] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2018-12-09 22:43  NiLuJe
+
+	* [r15585] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2018-11-22 05:26  NiLuJe
+
+	* [r15562] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2018-11-09 16:42  NiLuJe
+
+	* [r15529] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2018-11-09 02:11  NiLuJe
+
+	* [r15525] src/touch/install/install-k5.sh:
+	  
+	  Kindle Touch Hacks:
+	  * Bridge:
+	  * Make sure we won't fail to install the Kindlet key,
+	  even on devices without a keystore (because without Kindlet support at
+	  all).
+
+2018-09-28 02:00  NiLuJe
+
+	* [r15470] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (better requests fix, and actually ship OpenSSH..
+	  ;D)
+
+2018-09-27 19:23  NiLuJe
+
+	* [r15463] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (Unbreak requests)
+
+2018-09-10 20:17  NiLuJe
+
+	* [r15434] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (unbreak Python's SQLite module)
+
+2018-09-10 02:10  NiLuJe
+
+	* [r15423] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries... (the great gold to bfd switch...)
+
+2018-08-22 14:30  NiLuJe
+
+	* [r15338] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2018-08-06 03:08  NiLuJe
+
+	* [r15298] src/install/bridge.conf:
+	  
+	  Kindle Hacks:
+	  * Touch Hacks:
+	  * JailBreak:
+	  * Match bridge's setup_gandalf to the T in bridge job, don't stop
+	  halfway
+
+2018-07-25 00:05  NiLuJe
+
+	* [r15265] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2018-07-24 06:29  NiLuJe
+
+	* [r15253] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (unbreak dropbear)
+
+2018-07-24 00:33  NiLuJe
+
+	* [r15249] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (dropbear CFLAGS fix)
+
+2018-07-23 16:11  NiLuJe
+
+	* [r15247] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2018-07-20 14:41  NiLuJe
+
+	* [r15235] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2018-07-02 18:41  NiLuJe
+
+	* [r15128] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2018-06-21 23:03  NiLuJe
+
+	* [r15108] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2018-06-21 15:00  NiLuJe
+
+	* [r15092] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (Updated TC)
+
+2018-05-30 22:35  NiLuJe
+
+	* [r14989] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2018-05-16 00:14  NiLuJe
+
+	* [r14939] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh K4 binaries
+
+2018-05-15 20:56  NiLuJe
+
+	* [r14935] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Okay, static-libgcc experiment, let's see if that shakes things
+	  up...
+
+2018-05-14 18:30  NiLuJe
+
+	* [r14910] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh K5 binaries
+
+2016-07-30 15:34  NiLuJe
+
+	* [r13408] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2016-07-08 16:35  NiLuJe
+
+	* [r13336] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2016-06-21 02:49  NiLuJe
+
+	* [r13309] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Update binaries (TC update)
+
+2016-06-20 13:40  NiLuJe
+
+	* [r13306] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2016-05-18 16:37  NiLuJe
+
+	* [r13265] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (update TC)
+
+2016-04-24 13:53  NiLuJe
+
+	* [r13216] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2016-04-17 23:32  NiLuJe
+
+	* [r13188] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (Linaro 5.3 2016.04)
+
+2016-04-11 15:04  NiLuJe
+
+	* [r13156] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2016-04-03 17:04  NiLuJe
+
+	* [r13099] src/install/gandalf:
+	  
+	  KIndle Hacks:
+	  * Refresh binaries
+
+2016-03-02 20:43  NiLuJe
+
+	* [r13003] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * refresh binaries (initial GDB import)
+
+2016-02-21 00:10  NiLuJe
+
+	* [r12956] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2016-02-14 01:23  NiLuJe
+
+	* [r12903] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (Linaro 5.2 2015.11-2)
+
+2016-02-07 18:12  NiLuJe
+
+	* [r12851] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2016-01-18 03:13  NiLuJe
+
+	* [r12798] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (downgrade TC to 2015.11, for some strange reason I
+	  don't have time to investigate, my 2016.01 builds are utterly
+	  broken...)
+
+2016-01-16 20:41  NiLuJe
+
+	* [r12795] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (update TC)
+
+2015-12-04 18:48  NiLuJe
+
+	* [r12672] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-11-28 00:59  NiLuJe
+
+	* [r12659] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-11-20 19:02  NiLuJe
+
+	* [r12644] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-11-14 21:14  NiLuJe
+
+	* [r12632] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaires (TC update).
+	  The Kobo set is incomplete because sourceforge went down during the
+	  build, and is currently still down...
+
+2015-11-13 17:06  NiLuJe
+
+	* [r12624] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-11-06 21:03  NiLuJe
+
+	* [r12603] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (stop playing with FT's new TT stem darkening)
+
+2015-11-06 11:28  NiLuJe
+
+	* [r12589] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-11-05 16:24  NiLuJe
+
+	* [r12580] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-10-31 18:46  NiLuJe
+
+	* [r12573] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (fix dropbear interactive logins)
+
+2015-10-27 18:56  NiLuJe
+
+	* [r12558] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-10-22 16:23  NiLuJe
+
+	* [r12546] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-10-16 18:15  NiLuJe
+
+	* [r12526] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (TC update)
+
+2015-10-10 13:30  NiLuJe
+
+	* [r12507] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-10-03 23:11  NiLuJe
+
+	* [r12498] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (split K4/K5 FT binaries for the whole GCC 5 crashy
+	  weirdness)
+
+2015-10-03 21:06  NiLuJe
+
+	* [r12491] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (hopefully unbreaks FT overrides on legacy devices)
+
+2015-10-03 15:47  NiLuJe
+
+	* [r12487] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-09-27 14:01  NiLuJe
+
+	* [r12478] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-09-24 18:45  NiLuJe
+
+	* [r12450] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (nano fixes)
+
+2015-09-24 15:00  NiLuJe
+
+	* [r12441] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-09-20 00:16  NiLuJe
+
+	* [r12428] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaris (TC Update)
+
+2015-09-11 01:36  NiLuJe
+
+	* [r12385] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-09-05 02:01  NiLuJe
+
+	* [r12335] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (the great mmap enfixening!)
+
+2015-08-28 17:34  NiLuJe
+
+	* [r12304] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * refresh binaries
+
+2015-08-20 16:50  NiLuJe
+
+	* [r12267] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-08-16 10:33  NiLuJe
+
+	* [r12203] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (TC update)
+
+2015-08-15 13:31  NiLuJe
+
+	* [r12176] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-08-15 09:46  NiLuJe
+
+	* [r12172] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-08-14 09:39  NiLuJe
+
+	* [r12137] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-07-30 06:39  NiLuJe
+
+	* [r12103] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-07-27 03:04  NiLuJe
+
+	* [r12097] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-07-25 18:36  NiLuJe
+
+	* [r12086] src/install/gandalf:
+	  
+	  And a final round of VSN keyword pruning...
+
+2015-07-25 17:45  NiLuJe
+
+	* [r12080] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-06-17 01:45  NiLuJe
+
+	* [r12038] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (update IM to fix a ScreenSavers regression)
+
+2015-06-13 14:57  NiLuJe
+
+	* [r12025] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-06-05 22:17  NiLuJe
+
+	* [r12019] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  • Refresh binaries
+
+2015-05-31 01:14  NiLuJe
+
+	* [r12014] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-05-25 18:33  NiLuJe
+
+	* [r12003] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-05-07 22:32  NiLuJe
+
+	* [r11963] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Update binaries (updated TC)
+
+2015-05-01 02:02  NiLuJe
+
+	* [r11924] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Update binaries
+
+2015-04-28 19:31  NiLuJe
+
+	* [r11910] build/build-updates.sh:
+	  
+	  The great shebang enfixening!
+
+2015-03-11 00:58  NiLuJe
+
+	* [r11729] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-03-07 16:23  NiLuJe
+
+	* [r11725] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-03-07 01:28  NiLuJe
+
+	* [r11720] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-02-26 19:01  NiLuJe
+
+	* [r11698] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (fix fc-scan)
+
+2015-02-26 13:36  NiLuJe
+
+	* [r11688] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (fix Python)
+
+2015-02-26 02:23  NiLuJe
+
+	* [r11684] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh bianries...
+	  (LTO, AKA, The Breakening!)
+
+2015-02-25 15:00  NiLuJe
+
+	* [r11663] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  • Resync binaries
+
+2015-02-23 21:03  NiLuJe
+
+	* [r11616] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-02-23 02:18  NiLuJe
+
+	* [r11604] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * refresh binaries (fix readline)
+
+2015-02-22 20:47  NiLuJe
+
+	* [r11589] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Update binaries (misc zsh support)
+
+2015-02-22 14:25  NiLuJe
+
+	* [r11576] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-02-20 06:30  NiLuJe
+
+	* [r11558] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (fix strace)
+
+2015-02-19 23:37  NiLuJe
+
+	* [r11554] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (strace w/ libunwind, Python & SQLite3 w/ readline)
+
+2015-02-18 21:19  NiLuJe
+
+	* [r11541] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Update binaries (widec ncurses)
+
+2015-02-17 23:35  NiLuJe
+
+	* [r11537] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries (Linaro 4.9 2015.02)
+
+2015-02-12 18:23  NiLuJe
+
+	* [r11499] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Update binaries
+
+2015-01-31 19:58  NiLuJe
+
+	* [r11464] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-01-17 20:34  NiLuJe
+
+	* [r11432] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2015-01-05 23:16  NiLuJe
+
+	* [r11332] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2014-12-18 13:05  NiLuJe
+
+	* [r11252] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaires (updated TC)
+
+2014-12-17 18:50  NiLuJe
+
+	* [r11246] README:
+	  
+	  Kindle Touch Hacks:
+	  * Forgot the credits for Gandalf
+
+2014-11-30 13:41  NiLuJe
+
+	* [r11202] src/install/bridge.conf:
+	  
+	  Kindle Touch Hacks:
+	  * JailBreak:
+	  * Ouch. Grammar.
+
+2014-11-29 16:06  NiLuJe
+
+	* [r11186] build/build-updates.sh:
+	  
+	  Kindle Touch Hacks:
+	  * JailBreak:
+	  * Tag v1.14.N
+	  * MKK:
+	  * Tag v20141129
+
+2014-11-29 15:57  NiLuJe
+
+	* [r11185] src/touch/install/install-k5.sh:
+	  
+	  Kindle Touch Hacks:
+	  * jailBreak:
+	  * Oops, fix a very dump c/p typo.
+
+2014-11-29 15:52  NiLuJe
+
+	* [r11184] src/install/bridge.conf, src/touch/install/install-k5.sh:
+	  
+	  Kindle Touch Hacks:
+	  * JailBreak:
+	  * Try to survive a varlocal wipe (& a factory reset, w/ a bit of
+	  manual intervention [restoring the userstore]).
+
+2014-11-28 20:46  NiLuJe
+
+	* [r11172] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2014-11-25 21:29  NiLuJe
+
+	* [r11168] src/install/gandalf:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2014-11-25 19:02  NiLuJe
+
+	* [r11165] build/build-updates.sh:
+	  
+	  Kindle Touch Hacks:
+	  * MKK:
+	  * Tag v20141125
+	  * ScreenSavers:
+	  * Tag v0.21.N
+
+2014-11-25 17:54  NiLuJe
+
+	* [r11160] src/install/bridge.conf:
+	  
+	  Kindle Touch Hacks:
+	  * MKK:
+	  * Missed one.
+
+2014-11-25 17:53  NiLuJe
+
+	* [r11159] src/install/bridge.conf:
+	  
+	  Kindle Touch Hacks:
+	  * MKK:
+	  * Kill the debugging logging in the bridge job
+
+2014-11-25 17:43  NiLuJe
+
+	* [r11158] src/install/bridge.conf:
+	  
+	  Kindle Touch Hacks:
+	  * MKK:
+	  * Upstart wins again.
+
+2014-11-25 17:39  NiLuJe
+
+	* [r11157] src/install/bridge.conf:
+	  
+	  Kindle Touch Hacks:
+	  * MKK:
+	  * Add some debug logging to the bridge job...
+
+2014-11-24 17:20  NiLuJe
+
+	* [r11155] src/install/bridge.conf[ADD],
+	  src/touch/install/install-k5.sh:
+	  
+	  Kindle Touch Hacks:
+	  * MKK:
+	  * Try harder to not get screwed by FW 5.6.1...
+
+2014-11-23 15:42  NiLuJe
+
+	* [r11139] src/touch/install/install-k5.sh:
+	  
+	  Kindle Touch Hacks:
+	  * JailBreak:
+	  * The bridge will now carry the RP & CRP too, provided they were
+	  installed *before* the bridge (at least until the RP & CRP themselves
+	  are updated).
+
+2014-11-23 15:12  NiLuJe
+
+	* [r11138] src/touch/install/install-k5.sh:
+	  
+	  Kindle Touch Hacks:
+	  * Kill a stupid idea
+
+2014-11-22 18:45  NiLuJe
+
+	* [r11135] src/install/gandalf[ADD]:
+	  
+	  Kindle Hacks:
+	  * Refresh binaries
+
+2014-11-22 17:18  NiLuJe
+
+	* [r11132] src/touch/install/install-k5.sh:
+	  
+	  Kindle Touch Hacks:
+	  * Setup Gandalf tohelp with the FW 5.6.1 mess...
+
+2014-08-30 17:57  NiLuJe
+
+	* [r10881] src/touch/install/install-k5.sh:
+	  
+	  Kindle Hacks:
+	  * More /var/local free space checks
+
+2014-08-23 15:52  NiLuJe
+
+	* [r10845] src/legacy/uninstall/uninstall-legacy.sh,
+	  src/touch/uninstall/uninstall-k5.sh:
+	  
+	  Kindle Touch Hacks:
+	  * MKK:
+	  * Always chmod our json jar file as it should, even on uninstall.
+	  (Thanks to kaznelson for catching that one!).
+	  It doesn't appear to be critical (we've been doing it 'wrong' for a
+	  while without ill effects), but now it
+	  properly matches the vanilla permissions.
+
+2014-08-22 15:40  NiLuJe
+
+	* [r10836] src/legacy/install/install-legacy.sh,
+	  src/legacy/uninstall/uninstall-legacy.sh,
+	  src/touch/install/install-k5.sh, src/touch/uninstall/uninstall-k5.sh:
+	  
+	  Kindle Touch Hacks:
+	  * JailBreak:
+	  * Bundle MKK w/ the JB
+	  * Make the bridge restore MKK, too (thanks to kaznelson for the push,
+	  and an original implementation ;)).
+
+2014-08-22 14:59  NiLuJe
+
+	* [r10835] build/build-updates.sh:
+	  
+	  Kindle Touch Hacks:
+	  * MKK:
+	  * Tag v20140822
+
+2014-08-22 14:57  NiLuJe
+
+	* [r10834] src/touch/install/install-k5.sh,
+	  src/touch/uninstall/uninstall-k5.sh:
+	  
+	  Kindle Touch Hacks:
+	  * MKK:
+	  * Store a persistent copy of the files for the upcoming updated bridge
+	  code
+
+2014-06-27 01:40  NiLuJe
+
+	* [r10682] build/build-updates.sh, src/legacy/install/install-legacy.sh,
+	  src/legacy/uninstall/uninstall-legacy.sh:
+	  
+	  Kindle Hacks:
+	  * Move MKK (Legacy) & the K4 JB to libotautils
+
+2014-06-26 23:56  NiLuJe
+
+	* [r10677] src/touch/install/install-k5.sh,
+	  src/touch/uninstall/uninstall-k5.sh:
+	  
+	  Kindle Touch Hacks:
+	  * Fix logmsg() usage. The third arg is for key=value pairs.
+
+2014-06-26 21:21  NiLuJe
+
+	* [r10674] build/build-updates.sh, build/consts[DEL], build/ui[DEL],
+	  src/touch/install/install-k5.sh, src/touch/uninstall/uninstall-k5.sh:
+	  
+	  Kindle Touch Hacks:
+	  * Move everyone to libOTAUtils
+
+2014-06-24 22:21  NiLuJe
+
+	* [r10658] build/build-updates.sh:
+	  
+	  Kindle Hacks:
+	  • Detect GNU tar properly on OS X.
+	  The individual build scripts should now run on OS X, but the release
+	  scripts probably still don't (svn2cl [trivial], and some sed usage,
+	  mostly).
+
+2014-02-14 19:00  NiLuJe
+
+	* [r10332] README[CPY], README.txt[DEL]:
+	  
+	  Kindle Hacks:
+	  * MKK:
+	  * Initial draft of the MKK thread
+
+2014-02-14 17:47  NiLuJe
+
+	* [r10331] build/build-updates.sh:
+	  
+	  Kindle Touch Hacks:
+	  * DevCerts:
+	  * Rebrand as Mobileread Kindlet Kit, in preparation of the doc
+	  overhaul
+
+2014-02-14 17:27  NiLuJe
+
+	* [r10328] build/build-updates.sh:
+	  
+	  Kindle Hacks:
+	  * Use Update_*.bin package filenames instead of update_*.bin,
+	  to avoid triggering the recovery updater on boot. (thanks, dsmid ;))
+
+2013-07-11 01:11  NiLuJe
+
+	* [r9476] build/build-updates.sh:
+	  
+	  Kindle Touch Hacks:
+	  * Kindlet-Dev:
+	  * Hey, I'm using arrays anyway, I can probably get away with a C style
+	  for loop!
+	  And at least it's pretty.
+
+2013-07-11 01:05  NiLuJe
+
+	* [r9475] build/build-updates.sh:
+	  
+	  Kindle Touch Hacks:
+	  * Kindlet Dev:
+	  * More shell compat musings...
+
+2013-07-11 00:51  NiLuJe
+
+	* [r9474] build/build-updates.sh:
+	  
+	  Kindle Touch Hacks:
+	  * Kindlet-Dev:
+	  * Haha! Bash's compat mode strikes again!
+
+2013-07-10 18:06  NiLuJe
+
+	* [r9472] build/build-updates.sh:
+	  
+	  Kindle Touch Hacks:
+	  * Kindlet Dev:
+	  * Slightly useless check to the cleanup phase...
+
+2013-07-10 18:05  NiLuJe
+
+	* [r9471] build/build-updates.sh:
+	  
+	  Kindle Touch Hacks:
+	  * Kindle Dev:
+	  * Yup, looks good :).
+
+2013-07-10 18:03  NiLuJe
+
+	* [r9470] build/build-updates.sh, src/developer.keystore[DEL],
+	  src/install[ADD], src/install/developer.keystore[CPY],
+	  src/install/json_simple-1.1.jar[CPY], src/jb-json_simple-1.1.jar[DEL],
+	  src/ori-json_simple-1.1.jar[DEL], src/uninstall[ADD],
+	  src/uninstall/json_simple-1.1.jar[CPY]:
+	  
+	  Kindle Touch Hacks:
+	  * Kindle Dev:
+	  * Move stuff around to simplify the build script
+
+2013-07-10 17:23  NiLuJe
+
+	* [r9469] build/build-updates.sh:
+	  
+	  Kindle Touch Hacks:
+	  * Kindlet Dev:
+	  * More consistent naming scheme.
+
+2013-07-10 17:17  NiLuJe
+
+	* [r9468] build/build-updates.sh:
+	  
+	  Kindle Touch Hacks:
+	  * Huh. Workaround(?) a weird quirk.
+
+2013-07-10 17:08  NiLuJe
+
+	* [r9467] build/build-updates.sh:
+	  
+	  Kindle Touch Hacks:
+	  * Kindlet-Dev:
+	  * Oops, fix stupid oversight.
+
+2013-07-10 17:07  NiLuJe
+
+	* [r9466] README.txt, build/build-updates.sh,
+	  src/jb-json_simple-1.1.jar[ADD], src/legacy/install/install-legacy.sh,
+	  src/legacy/uninstall/uninstall-legacy.sh,
+	  src/ori-json_simple-1.1.jar[ADD], src/touch/install/install-k5.sh,
+	  src/touch/uninstall/uninstall-k5.sh:
+	  
+	  Kindle Touch Hacks:
+	  * Integrate the Kindlet JailBreak to the dev certs package, and rename
+	  it.
+	  Because, really, when you install the latter, you usually want the
+	  former,
+	  too, so why keep them in separate packages?
+
+2013-06-24 20:15  NiLuJe
+
+	* [r9325] build/build-updates.sh:
+	  
+	  Kindle Hacks:
+	  * Make all build scripts automatically bomb out on non 0 return codes,
+	  so I can safely catch
+	  snafus during my full rebuilds...
+
+2012-11-10 02:17  NiLuJe
+
+	* [r8900] build/build-updates.sh:
+	  
+	  Kindle Hacks:
+	  * Use the new aliases for the whole K4 & K5 model range in every build
+	  script
+
+2012-11-06 20:46  NiLuJe
+
+	* [r8850] build/build-updates.sh, src/developer.keystore:
+	  
+	  Kindle Touch Hacks:
+	  * Bump developer keystore to 20121106
+
+2012-10-25 18:30  NiLuJe
+
+	* [r8763] build/build-updates.sh:
+	  
+	  Kindle Touch Hacks:
+	  * Package for the UK 3G PW, too.
+
+2012-10-07 17:31  NiLuJe
+
+	* [r8671] build/build-updates.sh:
+	  
+	  Kindle Touch Hacks:
+	  * Use the documented pw shortname for the buildscripts
+
+2012-10-05 21:39  NiLuJe
+
+	* [r8666] build/build-updates.sh:
+	  
+	  Kindle Touch Hacks:
+	  * DevCerts:
+	  * Handle the PW
+
+2012-10-03 00:03  NiLuJe
+
+	* [r8650] build/build-updates.sh, src/developer.keystore:
+	  
+	  Kindle Touch Hacks:
+	  * Update dev keystore to 2012 10 02 (Thanks, PoP ;)).
+
+2012-09-13 16:26  NiLuJe
+
+	* [r8483] src/touch/install/install-k5.sh,
+	  src/touch/uninstall/uninstall-k5.sh:
+	  
+	  Kindle Touch Hacks:
+	  * Dev Certs:
+	  * Fix the log domain for K5 update scripts
+
+2012-09-13 16:11  NiLuJe
+
+	* [r8481] build/build-updates.sh:
+	  
+	  Kindle Hacks:
+	  * Dev Certs:
+	  * Fix package name to fall under an existing whitelisted item in the
+	  K3 JB
+
+2012-09-13 16:07  NiLuJe
+
+	* [r8480] build/build-updates.sh:
+	  
+	  Kindle Hacks:
+	  * DevCerts:
+	  * Add to packaging script
+	  * Forgot to cleanup the original utils tarball :)
+
+2012-09-13 16:02  NiLuJe
+
+	* [r8479] build/build-updates.sh, src/install-k5.sh[DEL],
+	  src/install-legacy.sh[DEL], src/legacy[ADD], src/legacy/install[ADD],
+	  src/legacy/install/install-legacy.sh[CPY], src/legacy/uninstall[ADD],
+	  src/legacy/uninstall/uninstall-legacy.sh[CPY], src/touch[ADD],
+	  src/touch/install[ADD], src/touch/install/install-k5.sh[CPY],
+	  src/touch/uninstall[ADD], src/touch/uninstall/uninstall-k5.sh[CPY],
+	  src/uninstall-k5.sh[DEL], src/uninstall-legacy.sh[DEL]:
+	  
+	  Kindle Hacks:
+	  * DevCerts:
+	  * Move stuff around to simplify the build script
+
+2012-09-13 15:53  NiLuJe
+
+	* [r8478] build/build-updates.sh, src/install-k5.sh,
+	  src/uninstall-k5.sh:
+	  
+	  Kindle Hacks:
+	  * DevCerts:
+	  * Fix stupid typo
+
+2012-09-13 15:49  NiLuJe
+
+	* [r8477] .[ADD], README.txt[ADD], build[ADD],
+	  build/build-updates.sh[ADD], build/consts[ADD],
+	  build/consts/patchconsts[ADD], build/ui[ADD], build/ui/blanket[ADD],
+	  build/ui/progressbar[ADD], src[ADD], src/developer.keystore[ADD],
+	  src/install-k5.sh[ADD], src/install-legacy.sh[ADD],
+	  src/uninstall-k5.sh[ADD], src/uninstall-legacy.sh[ADD]:
+	  
+	  Kindle Hacks:
+	  * Combined Developer Keystore installer for eveeeery device
+

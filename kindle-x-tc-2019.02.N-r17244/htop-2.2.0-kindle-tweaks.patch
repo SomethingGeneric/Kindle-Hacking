@@ -1,0 +1,14 @@
+diff --git a/htop.c b/htop.c
+index 6db81dd..c9a6be7 100644
+--- a/htop.c
++++ b/htop.c
+@@ -179,6 +179,9 @@ int main(int argc, char** argv) {
+    else
+       setlocale(LC_CTYPE, "");
+ 
++   setenv("TERMINFO", "/mnt/us/usbnet/etc/terminfo", 1);
++   setenv("HTOPRC", "/mnt/us/usbnet/etc/htoprc", 1);
++
+    CommandLineSettings flags = parseArguments(argc, argv); // may exit()
+ 
+ #ifdef HAVE_PROC

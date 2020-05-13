@@ -1,0 +1,14 @@
+diff --git a/src/base/ftobjs.c b/src/base/ftobjs.c
+index 1b042614d..cb6b1c59f 100644
+--- a/src/base/ftobjs.c
++++ b/src/base/ftobjs.c
+@@ -820,6 +820,9 @@
+     library = driver->root.library;
+     hinter  = library->auto_hinter;
+ 
++    /* NOTE: Kindle Hack. Always force grey smooth antialias */
++    load_flags |= FT_LOAD_TARGET_NORMAL;
++
+     /* resolve load flags dependencies */
+ 
+     if ( load_flags & FT_LOAD_NO_RECURSE )

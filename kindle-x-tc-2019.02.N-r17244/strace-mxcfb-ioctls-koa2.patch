@@ -1,0 +1,574 @@
+diff --git a/Makefile.am b/Makefile.am
+index 7b5d4a8b..397462f2 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -198,6 +198,7 @@ strace_SOURCES =	\
+ 	msghdr.c	\
+ 	msghdr.h	\
+ 	mtd.c		\
++	mxcfb.c		\
+ 	native_defs.h	\
+ 	nbd_ioctl.c	\
+ 	negated_errno.h	\
+diff --git a/defs.h b/defs.h
+index 5be982ac..4da227e9 100644
+--- a/defs.h
++++ b/defs.h
+@@ -1059,6 +1059,7 @@ DECL_IOCTL(term);
+ DECL_IOCTL(ubi);
+ DECL_IOCTL(uffdio);
+ DECL_IOCTL(watchdog);
++DECL_IOCTL(mxcfb);
+ # undef DECL_IOCTL
+ 
+ extern int decode_sg_io_v4(struct tcb *, const kernel_ulong_t arg);
+diff --git a/ioctl.c b/ioctl.c
+index bcf265b6..db11f014 100644
+--- a/ioctl.c
++++ b/ioctl.c
+@@ -262,6 +262,8 @@ ioctl_decode(struct tcb *tcp)
+ 	case 'E':
+ 		return evdev_ioctl(tcp, code, arg);
+ #endif
++	case 'F':
++		return mxcfb_ioctl(tcp, code, arg);
+ 	case 'I':
+ 		return inotify_ioctl(tcp, code, arg);
+ 	case 'L':
+diff --git a/mxcfb.c b/mxcfb.c
+new file mode 100644
+index 00000000..e47417a6
+--- /dev/null
++++ b/mxcfb.c
+@@ -0,0 +1,426 @@
++/*
++ * Copyright (c) 2018-2019 NiLuJe <ninuje@gmail.com>
++ * Extended from an original implementation:
++ * Copyright (c) 2014 Andrey Golovizin <ag@sologoc.com>
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. The name of the author may not be used to endorse or promote products
++ *    derived from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
++ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
++ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
++ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
++ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
++ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#include "defs.h"
++#include <linux/ioctl.h>
++#include <linux/mxcfb.h>
++
++#include "xlat/mxcfb_waveform_mode.h"
++#include "xlat/mxcfb_auto_update_mode.h"
++#include "xlat/mxcfb_epdc_flag.h"
++#include "xlat/mxcfb_temp_use.h"
++#include "xlat/mxcfb_update_mode.h"
++#include "xlat/mxcfb_update_scheme.h"
++#include "xlat/mxcfb_waveform_type.h"
++#include "xlat/mxcfb_material_type.h"
++#include "xlat/mxcfb_dithering_mode.h"
++
++
++void print_gamma(int ramp[16])
++{
++	unsigned int i;
++	for (i=0; i < (sizeof(ramp) / sizeof(ramp[0])); i++)
++	{
++		tprintf("%i", ramp[i]);
++	}
++}
++
++void print_rect(struct mxcfb_rect *rect)
++{
++	tprintf(
++		"top=%" PRIu32", left=%" PRIu32", width=%" PRIu32", height=%" PRIu32,
++		rect->top, rect->left, rect->width, rect->height
++	);
++}
++
++void print_alt_buffer_data(struct mxcfb_alt_buffer_data *alt_data)
++{
++	tprintf(
++		"phys_addr=%#" PRIx32", width=%" PRIu32", height=%" PRIu32,
++		alt_data->phys_addr, alt_data->width, alt_data->height
++	);
++	tprints(", alt_update_region={");
++	print_rect(&alt_data->alt_update_region);
++	tprints("}");
++}
++
++void print_csc_matrix(int param[5][3])
++{
++	// 5 rows, 3 columns
++	unsigned int r, c;
++	for(r=0; r<5; r++)
++	{
++		for(c=0; c<3; c++)
++		{
++			tprintf("%i ", param[r][c]);
++		}
++		tprints(" | ");
++	}
++}
++
++int mxcfb_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t arg)
++{
++	struct mxcfb_gbl_alpha gbl_alpha;
++	struct mxcfb_color_key color_key;
++	struct mxcfb_pos pos;
++	struct mxcfb_loc_alpha loc_alpha;
++	unsigned long ulong_arg;
++	struct mxcfb_gamma gamma;
++	struct mxcfb_csc_matrix csc_matrix;
++	struct mxcfb_waveform_modes waveform_modes;
++	uint32_t uint32_arg;
++	struct mxcfb_update_data update_data;
++	struct mxcfb_update_marker_data update_marker_data;
++	int32_t int32_arg;
++	//int int_arg;
++
++	switch (code)
++	{
++		case MXCFB_SET_GBL_ALPHA:
++			if (!verbose(tcp) || umove(tcp, arg, &gbl_alpha) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				tprintf("enable=%i", gbl_alpha.enable);
++				tprintf(", alpha=%i", gbl_alpha.alpha);
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case MXCFB_SET_CLR_KEY:
++			if (!verbose(tcp) || umove(tcp, arg, &color_key) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				tprintf("enable=%i", color_key.enable);
++				tprintf(", color_key=0x%08X", color_key.color_key);
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case MXCFB_SET_OVERLAY_POS:
++			if (!verbose(tcp) || umove(tcp, arg, &pos) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				tprintf("x=%" PRIu16, pos.x);
++				tprintf(", y=%" PRIu16, pos.y);
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case MXCFB_SET_LOC_ALPHA:
++			if (!verbose(tcp) || umove(tcp, arg, &loc_alpha) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				tprintf("enable=%i", loc_alpha.enable);
++				tprintf(", alpha_in_pixel=%i", loc_alpha.alpha_in_pixel);
++				tprintf(", alpha_phy_addr0=%#lx", loc_alpha.alpha_phy_addr0);
++				tprintf(", alpha_phy_addr1=%#lx", loc_alpha.alpha_phy_addr1);
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case MXCFB_SET_LOC_ALP_BUF:
++		case MXCFB_GET_WORK_BUFFER:
++			if (!verbose(tcp) || umove(tcp, arg, &ulong_arg) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprintf(", {%#lx", ulong_arg);
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case MXCFB_SET_GAMMA:
++			if (!verbose(tcp) || umove(tcp, arg, &gamma) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				tprintf("enable=%i", gamma.enable);
++				tprints(", constk=");
++				print_gamma(gamma.constk);
++				tprintf(", slopek=");
++				print_gamma(gamma.slopek);
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case MXCFB_CSC_UPDATE:
++			if (!verbose(tcp) || umove(tcp, arg, &csc_matrix) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				tprints("param=");
++				print_csc_matrix(csc_matrix.param);
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		// NOTE: Hahahaha! Noooope. arg is a struct mxcfb_gpu_split_fmt, whose first member is a struct fb_var_screeninfo... Nope nope nope!
++		//MXCFB_SET_GPU_SPLIT_FMT
++
++		case MXCFB_SET_WAVEFORM_MODES:
++			if (!verbose(tcp) || umove(tcp, arg, &waveform_modes) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				tprintf("mode_init=%i", waveform_modes.mode_init);
++				tprintf(", mode_du=%i", waveform_modes.mode_du);
++				tprintf(", mode_gc4=%i", waveform_modes.mode_gc4);
++				tprintf(", mode_gc8=%i", waveform_modes.mode_gc8);
++				tprintf(", mode_gc16=%i", waveform_modes.mode_gc16);
++				tprintf(", mode_gc32=%i", waveform_modes.mode_gc32);
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case MXCFB_SET_AUTO_UPDATE_MODE:
++			if (!verbose(tcp) || umove(tcp, arg, &uint32_arg) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				printxval(mxcfb_auto_update_mode, uint32_arg, "AUTO_UPDATE_MODE_???");
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case MXCFB_SEND_UPDATE:
++			if (!verbose(tcp) || umove(tcp, arg, &update_data) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				tprints("update_region={");
++				print_rect(&update_data.update_region);
++				tprints("}");
++				tprints(", waveform_mode=");
++				printxval(mxcfb_waveform_mode, update_data.waveform_mode, "WAVEFORM_MODE_???");
++				tprints(", update_mode=");
++				printxval(mxcfb_update_mode, update_data.update_mode, "UPDATE_MODE_???");
++				tprintf(", update_marker=%" PRIu32, update_data.update_marker);
++				tprints(", temp=");
++				printxval(mxcfb_temp_use, update_data.temp, "TEMP_USE_???");
++				tprints(", flags=");
++				printflags(mxcfb_epdc_flag, update_data.flags, "EPDC_FLAG_???");
++				tprints(", dither_mode=");
++				printxval(mxcfb_dithering_mode, update_data.dither_mode, "EPDC_FLAG_USE_DITHERING_???");
++				tprintf(", quant_bit=%i", update_data.quant_bit);
++				tprints(", alt_buffer_data={");
++				print_alt_buffer_data(&update_data.alt_buffer_data);
++				tprints("}");
++				tprints(", hist_bw_waveform_mode=");
++				printxval(mxcfb_waveform_mode, update_data.hist_bw_waveform_mode, "UPDATE_MODE_???");
++				tprints(", hist_gray_waveform_mode=");
++				printxval(mxcfb_waveform_mode, update_data.hist_gray_waveform_mode, "UPDATE_MODE_???");
++				tprintf(", ts_pxp=%" PRIu32, update_data.ts_pxp);
++				tprintf(", ts_epdc=%" PRIu32, update_data.ts_epdc);
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case MXCFB_WAIT_FOR_UPDATE_COMPLETE:
++			if (!verbose(tcp) || umove(tcp, arg, &update_marker_data) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				tprintf("update_marker=%" PRIu32, update_marker_data.update_marker);
++				tprintf(", collision_test=%" PRIu32, update_marker_data.collision_test);
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case MXCFB_SET_UPDATE_SCHEME:
++			if (!verbose(tcp) || umove(tcp, arg, &uint32_arg) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				printxval(mxcfb_update_scheme, uint32_arg, "UPDATE_SCHEME_???");
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case MXCFB_WAIT_FOR_VSYNC:
++		case MXCFB_GET_FB_IPU_CHAN:
++		case MXCFB_GET_FB_IPU_DI:
++		case MXCFB_GET_DIFMT:
++		case MXCFB_GET_FB_BLANK:
++		//case MXCFB_SET_DIFMT:			// Clashes w/ MXCFB_SET_TEMPERATURE
++		case MXCFB_WAIT_FOR_UPDATE_SUBMISSION:
++		case MXCFB_SET_NIGHTMODE:
++		case MXCFB_SET_PAUSE:
++		case MXCFB_GET_PAUSE:
++		case MXCFB_SET_RESUME:
++			if (!verbose(tcp) || umove(tcp, arg, &uint32_arg) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprintf(", {%" PRIu32, uint32_arg);
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case MXCFB_SET_TEMPERATURE:
++		case MXCFB_SET_PWRDOWN_DELAY:
++		case MXCFB_GET_PWRDOWN_DELAY:
++		case MXCFB_GET_TEMPERATURE:
++			if (!verbose(tcp) || umove(tcp, arg, &int32_arg) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprintf(", {%" PRIi32, int32_arg);
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case MXCFB_GET_WAVEFORM_TYPE:
++			if (!verbose(tcp) || umove(tcp, arg, &uint32_arg) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				printxval(mxcfb_waveform_type, uint32_arg, "WAVEFORM_TYPE_???");
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case MXCFB_GET_MATERIAL_TYPE:
++			if (!verbose(tcp) || umove(tcp, arg, &uint32_arg) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				printxval(mxcfb_material_type, uint32_arg, "EPD_MATERIAL_???");
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		// Clashes w/ MXCFB_SET_PWRDOWN_DELAY & MXCFB_GET_PWRDOWN_DELAY
++		/*
++		case MXCFB_SET_PREFETCH:
++		case MXCFB_GET_PREFETCH:
++			if (!verbose(tcp) || umove(tcp, arg, &int_arg) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprintf(", {%i", int_arg);
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++		*/
++
++		// No args, nothing to decode :)
++		/*
++		case MXCFB_DISABLE_EPDC_ACCESS:
++		case MXCFB_ENABLE_EPDC_ACCESS:
++		*/
++
++		default:
++			return 0;
++	}
++}
+diff --git a/xlat/mxcfb_auto_update_mode.in b/xlat/mxcfb_auto_update_mode.in
+new file mode 100644
+index 00000000..6f5c3d39
+--- /dev/null
++++ b/xlat/mxcfb_auto_update_mode.in
+@@ -0,0 +1,2 @@
++AUTO_UPDATE_MODE_REGION_MODE
++AUTO_UPDATE_MODE_AUTOMATIC_MODE
+diff --git a/xlat/mxcfb_dithering_mode.in b/xlat/mxcfb_dithering_mode.in
+new file mode 100644
+index 00000000..7401264d
+--- /dev/null
++++ b/xlat/mxcfb_dithering_mode.in
+@@ -0,0 +1,8 @@
++#unconditional
++EPDC_FLAG_USE_DITHERING_PASSTHROUGH
++EPDC_FLAG_USE_DITHERING_FLOYD_STEINBERG
++EPDC_FLAG_USE_DITHERING_ATKINSON
++EPDC_FLAG_USE_DITHERING_ORDERED
++EPDC_FLAG_USE_DITHERING_QUANT_ONLY
++EPDC_FLAG_USE_DITHERING_MAX
++
+diff --git a/xlat/mxcfb_epdc_flag.in b/xlat/mxcfb_epdc_flag.in
+new file mode 100644
+index 00000000..9200c704
+--- /dev/null
++++ b/xlat/mxcfb_epdc_flag.in
+@@ -0,0 +1,9 @@
++EPDC_FLAG_ENABLE_INVERSION
++EPDC_FLAG_FORCE_MONOCHROME
++EPDC_FLAG_USE_CMAP
++EPDC_FLAG_USE_ALT_BUFFER
++EPDC_FLAG_TEST_COLLISION
++EPDC_FLAG_GROUP_UPDATE
++EPDC_FLAG_USE_DITHERING_Y1
++EPDC_FLAG_USE_DITHERING_Y4
++EPDC_FLAG_USE_REGAL
+diff --git a/xlat/mxcfb_material_type.in b/xlat/mxcfb_material_type.in
+new file mode 100644
+index 00000000..b419e70b
+--- /dev/null
++++ b/xlat/mxcfb_material_type.in
+@@ -0,0 +1,3 @@
++EPD_MATERIAL_V220
++EPD_MATERIAL_V320
++EPD_MATERIAL_CARTA_1_2
+diff --git a/xlat/mxcfb_temp_use.in b/xlat/mxcfb_temp_use.in
+new file mode 100644
+index 00000000..4ba503f5
+--- /dev/null
++++ b/xlat/mxcfb_temp_use.in
+@@ -0,0 +1,2 @@
++TEMP_USE_AMBIENT
++TEMP_USE_AUTO
+diff --git a/xlat/mxcfb_update_mode.in b/xlat/mxcfb_update_mode.in
+new file mode 100644
+index 00000000..e68b6693
+--- /dev/null
++++ b/xlat/mxcfb_update_mode.in
+@@ -0,0 +1,2 @@
++UPDATE_MODE_PARTIAL
++UPDATE_MODE_FULL
+diff --git a/xlat/mxcfb_update_scheme.in b/xlat/mxcfb_update_scheme.in
+new file mode 100644
+index 00000000..17962a9e
+--- /dev/null
++++ b/xlat/mxcfb_update_scheme.in
+@@ -0,0 +1,3 @@
++UPDATE_SCHEME_SNAPSHOT
++UPDATE_SCHEME_QUEUE
++UPDATE_SCHEME_QUEUE_AND_MERGE
+diff --git a/xlat/mxcfb_waveform_mode.in b/xlat/mxcfb_waveform_mode.in
+new file mode 100644
+index 00000000..28228c38
+--- /dev/null
++++ b/xlat/mxcfb_waveform_mode.in
+@@ -0,0 +1,20 @@
++WAVEFORM_MODE_GLR16
++WAVEFORM_MODE_GLD16
++WAVEFORM_MODE_GCK16
++WAVEFORM_MODE_GLKW16
++WAVEFORM_MODE_AUTO
++WAVEFORM_MODE_INIT
++WAVEFORM_MODE_DU
++WAVEFORM_MODE_GC16
++WAVEFORM_MODE_GL16
++WAVEFORM_MODE_A2
++WAVEFORM_MODE_DU4
++WAVEFORM_MODE_LAST
++WAVEFORM_MODE_REAGL
++WAVEFORM_MODE_REAGLD
++WAVEFORM_MODE_GCK16
++WAVEFORM_MODE_GLKW16
++WAVEFORM_MODE_GC16_FAST
++WAVEFORM_MODE_GL16_FAST
++WAVEFORM_MODE_GL4
++WAVEFORM_MODE_GL16_INV
+diff --git a/xlat/mxcfb_waveform_type.in b/xlat/mxcfb_waveform_type.in
+new file mode 100644
+index 00000000..d173d6be
+--- /dev/null
++++ b/xlat/mxcfb_waveform_type.in
+@@ -0,0 +1,2 @@
++WAVEFORM_TYPE_4BIT
++WAVEFORM_TYPE_5BIT

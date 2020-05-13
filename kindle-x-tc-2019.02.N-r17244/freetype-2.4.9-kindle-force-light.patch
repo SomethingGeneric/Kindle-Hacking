@@ -1,0 +1,15 @@
+diff --git a/src/base/ftobjs.c b/src/base/ftobjs.c
+index 1b042614d..f847cbf3e 100644
+--- a/src/base/ftobjs.c
++++ b/src/base/ftobjs.c
+@@ -820,6 +820,10 @@
+     library = driver->root.library;
+     hinter  = library->auto_hinter;
+ 
++    /* NOTE: Kindle Hack. Always force light grey smooth antialias, unless we asked for monochrome rendering */
++    if ( !( load_flags & FT_LOAD_MONOCHROME ) )
++        load_flags |= FT_LOAD_TARGET_LIGHT;
++
+     /* resolve load flags dependencies */
+ 
+     if ( load_flags & FT_LOAD_NO_RECURSE )

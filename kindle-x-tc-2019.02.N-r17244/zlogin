@@ -1,0 +1,26 @@
+##
+#
+#  NiLuJe's .zlogin - eInk edition
+#
+#  kate: syntax Zsh
+#
+#  $Id: zlogin 16452 2019-09-03 15:06:45Z NiLuJe $
+#
+##
+
+# Execute code in the background so it doesn't affect the current session
+(
+	autoload -U zrecompile
+
+	# Compile zcompdump, if modified, to increase startup speed.
+	zcompdump="${ZDOTDIR:-$HOME}/.zcompdump"
+	if [[ -s "${zcompdump}" && (! -s "${zcompdump}.zwc" || "${zcompdump}" -nt "${zcompdump}.zwc") ]] ; then
+		zrecompile -pq "${zcompdump}"
+	fi
+
+	# zcompile .zshrc & co
+	for my_z in zshrc .zshrc zprofile .zprofile zshenv .zshenv ; do
+		local my_zf="${ZDOTDIR:-${HOME}}/${my_z}"
+		[[ -f "${my_zf}" ]] && zrecompile -pq "${my_zf}"
+	done
+) &!

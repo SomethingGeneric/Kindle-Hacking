@@ -1,0 +1,31 @@
+diff --git a/magick/composite.c b/magick/composite.c
+index f0c293a5c..26f649bc9 100644
+--- a/magick/composite.c
++++ b/magick/composite.c
+@@ -1648,24 +1648,8 @@ MagickExport MagickBooleanType CompositeImageChannel(Image *image,
+   source_image=CloneImage(composite,0,0,MagickTrue,exception);
+   if (source_image == (const Image *) NULL)
+     return(MagickFalse);
+-  switch (compose)
+-  {
+-    case CopyCompositeOp:
+-    case CopyRedCompositeOp:
+-    case CopyGreenCompositeOp:
+-    case CopyBlueCompositeOp:
+-    case CopyCyanCompositeOp:
+-    case CopyMagentaCompositeOp:
+-    case CopyYellowCompositeOp:
+-    case CopyBlackCompositeOp:
+-      break;
+-    default:
+-    {
+-      if (IsGrayColorspace(image->colorspace) == MagickFalse)
+-        (void) SetImageColorspace(image,sRGBColorspace);
+-      break;
+-    }
+-  }
++  if (IsGrayColorspace(image->colorspace) != MagickFalse)
++    (void) SetImageColorspace(image,sRGBColorspace);
+   (void) SetImageColorspace(source_image,image->colorspace);
+   GetMagickPixelPacket(image,&zero);
+   canvas_image=(Image *) NULL;

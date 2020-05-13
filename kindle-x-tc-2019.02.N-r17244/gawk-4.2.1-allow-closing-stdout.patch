@@ -1,0 +1,20 @@
+diff --git a/io.c b/io.c
+index 9ca29dac..02d09b77 100644
+--- a/io.c
++++ b/io.c
+@@ -1215,6 +1215,15 @@ do_close(int nargs)
+ 	}
+ 
+ 	if (rp == NULL) {	/* no match, return -1 */
++		// NOTE: Very ugly Kindle hack: allow closing stdout...
++		if (strcasecmp(tmp->stptr, "/dev/stdout") == 0) {
++			if (do_lint)
++				lintwarn(_("close: Dirty Kindle hack! closing stdout via freopen /dev/null . . ."));
++			// NOTE: We don't just close stdout in order to keep fd 1 'open', and not wreak havoc in gawk's handling of fd...
++			// So, we rely on stuff that will close stdout, and then reopen fd 1 to /dev/null, making both Java/KUAL & gawk happy :).
++			freopen("/dev/null", "w", stdout);
++		}
++
+ 		char *cp;
+ 
+ 		if (do_lint)

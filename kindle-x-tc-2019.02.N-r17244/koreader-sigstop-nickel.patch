@@ -1,0 +1,38 @@
+diff --git a/platform/kobo/koreader.sh b/platform/kobo/koreader.sh
+index 601f58c..37e91f6 100755
+--- a/platform/kobo/koreader.sh
++++ b/platform/kobo/koreader.sh
+@@ -62,7 +62,8 @@ if [ "${FROM_NICKEL}" = "true" ] ; then
+ 	sleep 1
+ 	sync
+ 	# stop kobo software because it's running
+-	killall nickel hindenburg sickel fickel fmon 2>/dev/null
++	killall -TERM fmon 2>/dev/null
++	killall -STOP nickel hindenburg sickel fickel 2>/dev/null
+ 
+ 	# NOTE: Not particularly critical, we should be safe leaving it up, but since we reboot on exit anyway...
+ 	#	Keep KFMon up for now to make sure it's not doing anything overly stupid we might have overlooked ;).
+@@ -111,21 +112,14 @@ if awk '$4~/(^|,)ro($|,)/' /proc/mounts | grep ' /mnt/sd ' ; then
+ 	mount -o remount,rw /mnt/sd
+ fi
+ 
+-./reader.lua "${args}" > crash.log 2>&1
++./reader.lua "${args}" &> crash.log
+ 
+ if [ "${FROM_NICKEL}" = "true" ] ; then
+ 	if [ "${FROM_KFMON}" != "true" ] ; then
+ 		# start kobo software because it was running before koreader
+ 		./nickel.sh &
+ 	else
+-		if grep -q 'reboot_on_exit=false' /mnt/onboard/.adds/kfmon/config/koreader.ini 2>/dev/null ; then
+-			# The user wants to try to restart Nickel instead of rebooting!
+-			./nickel.sh &
+-		else
+-			# By default, if we were called from KFMon, just reboot, because there might be a chance Nickel will get its panties in a serious twist on restore for one reason or another...
+-			# And at best, we'd still restart with slightly broken suspend behavior anyway...
+-			reboot
+-		fi
++		killall -CONT nickel hindenburg sickel fickel 2>/dev/null
+ 	fi
+ else
+ 	# if we were called from advboot then we must reboot to go to the menu

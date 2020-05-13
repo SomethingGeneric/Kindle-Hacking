@@ -1,0 +1,26 @@
+diff -Nuar Python-2.7.5-ori/Python/pythonrun.c Python-2.7.5/Python/pythonrun.c
+--- Python-2.7.5-ori/Python/pythonrun.c	2013-08-02 21:55:27.285798880 +0200
++++ Python-2.7.5/Python/pythonrun.c	2013-08-02 22:03:44.978576864 +0200
+@@ -677,6 +677,7 @@
+ }
+ 
+ static char *default_home = NULL;
++static char *fallback_home = "/mnt/us/python";
+ 
+ void
+ Py_SetPythonHome(char *home)
+@@ -688,8 +689,13 @@
+ Py_GetPythonHome(void)
+ {
+     char *home = default_home;
+-    if (home == NULL && !Py_IgnoreEnvironmentFlag)
++    if (home == NULL && !Py_IgnoreEnvironmentFlag) {
++        /* Respect env... */
+         home = Py_GETENV("PYTHONHOME");
++        /* ...But fallback to a sane value for our Kindle if it's not set */
++        if (home == NULL)
++            home = fallback_home;
++    }
+     return home;
+ }
+ 

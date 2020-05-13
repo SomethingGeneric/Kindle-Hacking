@@ -1,0 +1,28 @@
+diff -Nuarp zsh-5.0.7-ori/Src/Makefile.in zsh-5.0.7/Src/Makefile.in
+--- zsh-5.0.7-ori/Src/Makefile.in	2013-11-27 20:00:20.000000000 +0100
++++ zsh-5.0.7/Src/Makefile.in	2015-03-06 17:21:52.078313271 +0100
+@@ -44,8 +44,8 @@ dir_src       = .
+ 
+ # ========= DEPENDENCIES FOR BUILDING ==========
+ 
+-LINK        = $(CC) $(LDFLAGS) $(EXELDFLAGS) $(EXTRA_LDFLAGS) -o $@
+-DLLINK      = $(DLLD) $(LDFLAGS) $(LIBLDFLAGS) $(DLLDFLAGS) -o $@
++LINK        = $(CC) $(CFLAGS) $(LDFLAGS) $(EXELDFLAGS) $(EXTRA_LDFLAGS) -o $@
++DLLINK      = $(DLLD) $(CFLAGS) $(LDFLAGS) $(LIBLDFLAGS) $(DLLDFLAGS) -o $@
+ 
+ all: bin modules
+ .PHONY: all
+diff -Nuarp zsh-5.0.7-ori/Src/Makemod.in.in zsh-5.0.7/Src/Makemod.in.in
+--- zsh-5.0.7-ori/Src/Makemod.in.in	2013-11-27 20:00:20.000000000 +0100
++++ zsh-5.0.7/Src/Makemod.in.in	2015-03-06 17:21:41.432446363 +0100
+@@ -49,8 +49,8 @@ DNCFLAGS =
+ 
+ COMPILE     = $(CC) -c -I. -I$(dir_top)/Src -I$(sdir_top)/Src -I$(sdir_top)/Src/Zle -I$(sdir) $(CPPFLAGS) $(DEFS) $(CFLAGS) $(D@L@CFLAGS)
+ DLCOMPILE   = $(CC) -c -I. -I$(dir_top)/Src -I$(sdir_top)/Src -I$(sdir_top)/Src/Zle -I$(sdir) $(CPPFLAGS) $(DEFS) -DMODULE $(CFLAGS) $(DLCFLAGS)
+-LINK        = $(CC) $(LDFLAGS) $(EXELDFLAGS) $(EXTRA_LDFLAGS) -o $@
+-DLLINK      = $(DLLD) $(LDFLAGS) $(LIBLDFLAGS) $(DLLDFLAGS) -o $@
++LINK        = $(CC) $(CFLAGS) $(LDFLAGS) $(EXELDFLAGS) $(EXTRA_LDFLAGS) -o $@
++DLLINK      = $(DLLD) $(CFLAGS) $(LDFLAGS) $(LIBLDFLAGS) $(DLLDFLAGS) -o $@
+ 
+ KNR_OBJ=.o
+ KNROBJ=._foo_

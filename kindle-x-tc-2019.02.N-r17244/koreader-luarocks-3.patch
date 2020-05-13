@@ -1,0 +1,34 @@
+diff --git a/Makefile.third b/Makefile.third
+index 1cdaf34f..647ace02 100644
+--- a/Makefile.third
++++ b/Makefile.third
+@@ -658,8 +658,6 @@ $(LUA_SPORE_ROCK): $(THIRDPARTY_DIR)/lua-Spore/*.*
+ 		-DLUA_SPORE_VER=$(LUA_SPORE_VER) -DLD="$(CC)" \
+ 		-DCC="$(CC)" -DCFLAGS="$(CFLAGS) -I$(LUAJIT_DIR)/src" \
+ 		-DLUAROCKS=$(if $(DARWINHOST),"luarocks --lua-dir=/usr/local/opt/lua@5.1",luarocks) \
+-		-DLUA_INCDIR=$(if $(DARWINHOST),/usr/local/opt/lua@5.1/include/lua5.1,"$(LUAJIT_DIR)/src") \
+-		-DLUA_LIBDIR=$(if $(DARWINHOST),/usr/local/opt/lua@5.1/lib,"$(CURDIR)/$(dir $(LUAJIT_LIB))") \
+ 		$(if $(ANDROID),-DLIBFLAG="$(LDFLAGS) $(CURDIR)/$(LUAJIT_LIB) -nostartfiles",) \
+ 		$(CURDIR)/$(THIRDPARTY_DIR)/lua-Spore && \
+ 		$(CMAKE_MAKE_PROGRAM) $(CMAKE_MAKE_PROGRAM_FLAGS)
+diff --git a/thirdparty/lua-Spore/CMakeLists.txt b/thirdparty/lua-Spore/CMakeLists.txt
+index c626a1bc..b8a4b8b3 100644
+--- a/thirdparty/lua-Spore/CMakeLists.txt
++++ b/thirdparty/lua-Spore/CMakeLists.txt
+@@ -10,8 +10,6 @@ enable_language(C)
+ assert_var_defined(CC)
+ assert_var_defined(CFLAGS)
+ assert_var_defined(LD)
+-assert_var_defined(LUA_INCDIR)
+-assert_var_defined(LUA_LIBDIR)
+ assert_var_defined(LUA_SPORE_VER)
+ assert_var_defined(OUTPUT_DIR)
+ assert_var_defined(LUAROCKS)
+@@ -25,7 +23,6 @@ if(DEFINED LIBFLAG)
+     set(BUILD_CMD "${BUILD_CMD} LIBFLAG=\"${LIBFLAG}\"")
+ endif()
+ set(BUILD_CMD "${BUILD_CMD} CC=\"${CC}\" CFLAGS=\"${CFLAGS}\" LD=\"${LD}\"")
+-set(BUILD_CMD "${BUILD_CMD} LUA_INCDIR=\"${LUA_INCDIR}\" LUA_LIBDIR=\"${LUA_LIBDIR}\"")
+ 
+ set(PATCH_CMD sh -c "mkdir -p doc && ${ISED} \"s| 'luasocket|--'luasocket|g\" ${LUA_SPORE_ROCKSPEC}")
+ 

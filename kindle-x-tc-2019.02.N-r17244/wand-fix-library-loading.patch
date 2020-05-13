@@ -1,0 +1,33 @@
+diff --git a/wand/api.py b/wand/api.py
+index 80cca6f..3549849 100644
+--- a/wand/api.py
++++ b/wand/api.py
+@@ -38,10 +38,10 @@ def library_paths():
+     """
+     libwand = None
+     libmagick = None
+-    versions = '', '-7', '-7.Q8', '-7.Q16', '-6', '-Q16', '-Q8', '-6.Q16'
++    versions = '', '-6.Q8', '-6', '-Q16', '-Q8', '-6.Q16', '-7', '-7.Q8', '-7.Q16'
+     options = '', 'HDRI', 'HDRI-2'
+     system = platform.system()
+-    magick_home = os.environ.get('MAGICK_HOME')
++    magick_home = '/mnt/us/python'
+     magick_suffix = os.environ.get('WAND_MAGICK_LIBRARY_SUFFIX')
+ 
+     if system == 'Windows':
+@@ -91,12 +91,12 @@ def library_paths():
+                 libwand = 'lib', 'libMagickWand{0}.dylib'.format(suffix),
+                 yield magick_path(libwand), magick_path(libwand)
+             else:
+-                libwand = 'lib', 'libMagickWand{0}.so'.format(suffix),
+-                libmagick = 'lib', 'libMagickCore{0}.so'.format(suffix),
+-                yield magick_path(libwand), magick_path(libmagick)
+                 libwand = 'lib', 'libMagickWand{0}.so.6'.format(suffix),
+                 libmagick = 'lib', 'libMagickCore{0}.so.6'.format(suffix),
+                 yield magick_path(libwand), magick_path(libmagick)
++                libwand = 'lib', 'libMagickWand{0}.so'.format(suffix),
++                libmagick = 'lib', 'libMagickCore{0}.so'.format(suffix),
++                yield magick_path(libwand), magick_path(libmagick)
+     for suffix in suffixes:
+         if system == 'Windows':
+             libwand = ctypes.util.find_library('CORE_RL_wand_' + suffix)

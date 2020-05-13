@@ -1,0 +1,14 @@
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 7a35575..bc676bb 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -165,7 +165,8 @@ libfontconfig_la_SOURCES = \
+ lib_LTLIBRARIES = libfontconfig.la
+ 
+ libfontconfig_la_LDFLAGS =			\
+-	-version-info @LIBT_VERSION_INFO@ -no-undefined $(export_symbols)
++	-version-info @LIBT_VERSION_INFO@ -no-undefined $(export_symbols) \
++	$(XC_LINKTOOL_CFLAGS)
+ 
+ libfontconfig_la_LIBADD = $(ICONV_LIBS) $(FREETYPE_LIBS) $(LIBXML2_LIBS) $(EXPAT_LIBS) $(UUID_LIBS) $(LTLIBINTL)
+ 

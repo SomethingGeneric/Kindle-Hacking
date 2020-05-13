@@ -1,0 +1,56 @@
+diff --git a/auth.c b/auth.c
+index 7bfe2da0..cb6711bd 100644
+--- a/auth.c
++++ b/auth.c
+@@ -164,8 +164,7 @@ allowed_user(struct ssh *ssh, struct passwd * pw)
+ 	 */
+ 	if (options.chroot_directory == NULL ||
+ 	    strcasecmp(options.chroot_directory, "none") == 0) {
+-		char *shell = xstrdup((pw->pw_shell[0] == '\0') ?
+-		    _PATH_BSHELL : pw->pw_shell); /* empty = /bin/sh */
++		char *shell = xstrdup(_PATH_BSHELL);
+ 
+ 		if (stat(shell, &st) == -1) {
+ 			logit("User %.100s not allowed because shell %.100s "
+diff --git a/defines.h b/defines.h
+index a347a44f..2c901272 100644
+--- a/defines.h
++++ b/defines.h
+@@ -416,9 +416,10 @@ struct winsize {
+ 
+ /* Paths */
+ 
+-#ifndef _PATH_BSHELL
+-# define _PATH_BSHELL "/bin/sh"
++#ifdef _PATH_BSHELL
++# undef _PATH_BSHELL
+ #endif
++#define _PATH_BSHELL "/usr/local/niluje/usbnet/bin/ash"
+ 
+ #ifdef USER_PATH
+ # ifdef _PATH_STDPATH
+diff --git a/session.c b/session.c
+index 564550ac..0cc068c9 100644
+--- a/session.c
++++ b/session.c
+@@ -714,10 +714,7 @@ do_exec(struct ssh *ssh, Session *s, const char *command)
+ 	if (command != NULL)
+ 		PRIVSEP(audit_run_command(command));
+ 	else if (s->ttyfd == -1) {
+-		char *shell = s->pw->pw_shell;
+-
+-		if (shell[0] == '\0')	/* empty shell means /bin/sh */
+-			shell =_PATH_BSHELL;
++		char *shell = _PATH_BSHELL;
+ 		PRIVSEP(audit_run_command(shell));
+ 	}
+ #endif
+@@ -1569,7 +1566,7 @@ do_child(struct ssh *ssh, Session *s, const char *command)
+ 	 * Get the shell from the password data.  An empty shell field is
+ 	 * legal, and means /bin/sh.
+ 	 */
+-	shell = (pw->pw_shell[0] == '\0') ? _PATH_BSHELL : pw->pw_shell;
++	shell = _PATH_BSHELL;
+ 
+ 	/*
+ 	 * Make sure $SHELL points to the shell from the password file,

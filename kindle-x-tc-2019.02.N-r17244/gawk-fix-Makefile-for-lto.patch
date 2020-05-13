@@ -1,0 +1,114 @@
+diff --git a/extension/Makefile.in b/extension/Makefile.in
+index f9519f5f..9e0a73f5 100644
+--- a/extension/Makefile.in
++++ b/extension/Makefile.in
+@@ -174,86 +174,86 @@ am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+ am__v_lt_0 = --silent
+ am__v_lt_1 = 
+ filefuncs_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
++	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(XC_LINKTOOL_CFLAGS) \
+ 	$(filefuncs_la_LDFLAGS) $(LDFLAGS) -o $@
+ fnmatch_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+ am_fnmatch_la_OBJECTS = fnmatch.lo
+ fnmatch_la_OBJECTS = $(am_fnmatch_la_OBJECTS)
+ fnmatch_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
++	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(XC_LINKTOOL_CFLAGS) \
+ 	$(fnmatch_la_LDFLAGS) $(LDFLAGS) -o $@
+ fork_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+ am_fork_la_OBJECTS = fork.lo
+ fork_la_OBJECTS = $(am_fork_la_OBJECTS)
+ fork_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
++	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(XC_LINKTOOL_CFLAGS) \
+ 	$(fork_la_LDFLAGS) $(LDFLAGS) -o $@
+ inplace_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+ am_inplace_la_OBJECTS = inplace.lo
+ inplace_la_OBJECTS = $(am_inplace_la_OBJECTS)
+ inplace_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
++	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(XC_LINKTOOL_CFLAGS) \
+ 	$(inplace_la_LDFLAGS) $(LDFLAGS) -o $@
+ intdiv_la_DEPENDENCIES = $(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1)
+ am_intdiv_la_OBJECTS = intdiv.lo
+ intdiv_la_OBJECTS = $(am_intdiv_la_OBJECTS)
+ intdiv_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
++	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(XC_LINKTOOL_CFLAGS) \
+ 	$(intdiv_la_LDFLAGS) $(LDFLAGS) -o $@
+ ordchr_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+ am_ordchr_la_OBJECTS = ordchr.lo
+ ordchr_la_OBJECTS = $(am_ordchr_la_OBJECTS)
+ ordchr_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
++	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(XC_LINKTOOL_CFLAGS) \
+ 	$(ordchr_la_LDFLAGS) $(LDFLAGS) -o $@
+ readdir_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+ am_readdir_la_OBJECTS = readdir.lo
+ readdir_la_OBJECTS = $(am_readdir_la_OBJECTS)
+ readdir_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
++	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(XC_LINKTOOL_CFLAGS) \
+ 	$(readdir_la_LDFLAGS) $(LDFLAGS) -o $@
+ readdir_test_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+ am_readdir_test_la_OBJECTS = readdir_test.lo
+ readdir_test_la_OBJECTS = $(am_readdir_test_la_OBJECTS)
+ readdir_test_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+ 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+-	$(AM_CFLAGS) $(CFLAGS) $(readdir_test_la_LDFLAGS) $(LDFLAGS) \
++	$(AM_CFLAGS) $(CFLAGS) $(XC_LINKTOOL_CFLAGS) $(readdir_test_la_LDFLAGS) $(LDFLAGS) \
+ 	-o $@
+ readfile_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+ am_readfile_la_OBJECTS = readfile.lo
+ readfile_la_OBJECTS = $(am_readfile_la_OBJECTS)
+ readfile_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
++	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(XC_LINKTOOL_CFLAGS) \
+ 	$(readfile_la_LDFLAGS) $(LDFLAGS) -o $@
+ revoutput_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+ am_revoutput_la_OBJECTS = revoutput.lo
+ revoutput_la_OBJECTS = $(am_revoutput_la_OBJECTS)
+ revoutput_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
++	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(XC_LINKTOOL_CFLAGS) \
+ 	$(revoutput_la_LDFLAGS) $(LDFLAGS) -o $@
+ revtwoway_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+ am_revtwoway_la_OBJECTS = revtwoway.lo
+ revtwoway_la_OBJECTS = $(am_revtwoway_la_OBJECTS)
+ revtwoway_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
++	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(XC_LINKTOOL_CFLAGS) \
+ 	$(revtwoway_la_LDFLAGS) $(LDFLAGS) -o $@
+ rwarray_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+ am_rwarray_la_OBJECTS = rwarray.lo
+ rwarray_la_OBJECTS = $(am_rwarray_la_OBJECTS)
+ rwarray_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
++	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(XC_LINKTOOL_CFLAGS) \
+ 	$(rwarray_la_LDFLAGS) $(LDFLAGS) -o $@
+ testext_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+ am_testext_la_OBJECTS = testext.lo
+ testext_la_OBJECTS = $(am_testext_la_OBJECTS)
+ testext_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
++	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(XC_LINKTOOL_CFLAGS) \
+ 	$(testext_la_LDFLAGS) $(LDFLAGS) -o $@
+ time_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+ am_time_la_OBJECTS = time.lo
+ time_la_OBJECTS = $(am_time_la_OBJECTS)
+ time_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
++	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(XC_LINKTOOL_CFLAGS) \
+ 	$(time_la_LDFLAGS) $(LDFLAGS) -o $@
+ AM_V_P = $(am__v_P_@AM_V@)
+ am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
+@@ -283,7 +283,7 @@ am__v_CC_0 = @echo "  CC      " $@;
+ am__v_CC_1 = 
+ CCLD = $(CC)
+ LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
++	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(XC_LINKTOOL_CFLAGS) \
+ 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)

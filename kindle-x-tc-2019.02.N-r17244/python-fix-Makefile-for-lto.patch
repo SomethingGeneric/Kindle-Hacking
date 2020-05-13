@@ -1,0 +1,51 @@
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index 2ca994c59b..1da0153689 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -121,8 +121,8 @@ LIBP=		$(LIBDIR)/python$(VERSION)
+ 
+ # Symbols used for using shared libraries
+ SO=		@SO@
+-LDSHARED=	@LDSHARED@ $(LDFLAGS)
+-BLDSHARED=	@BLDSHARED@ $(LDFLAGS)
++LDSHARED=	@LDSHARED@ $(CFLAGS) $(LDFLAGS)
++BLDSHARED=	@BLDSHARED@ $(CFLAGS) $(LDFLAGS)
+ LDCXXSHARED=	@LDCXXSHARED@
+ DESTSHARED=	$(BINLIBDEST)/lib-dynload
+ 
+@@ -488,7 +488,7 @@ coverage-report: regen-grammar
+ 
+ # Build the interpreter
+ $(BUILDPYTHON):	Modules/python.o $(LIBRARY) $(LDLIBRARY)
+-		$(LINKCC) $(LDFLAGS) $(LINKFORSHARED) -o $@ \
++		$(LINKCC) $(CFLAGS) $(LDFLAGS) $(LINKFORSHARED) -o $@ \
+ 			Modules/python.o \
+ 			$(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS) $(LDLAST)
+ 
+@@ -569,7 +569,7 @@ libpython$(VERSION).so: $(LIBRARY_OBJS)
+ 	fi
+ 
+ libpython$(VERSION).dylib: $(LIBRARY_OBJS)
+-	 $(CC) -dynamiclib -Wl,-single_module $(LDFLAGS) -undefined dynamic_lookup -Wl,-install_name,$(prefix)/lib/libpython$(VERSION).dylib -Wl,-compatibility_version,$(VERSION) -Wl,-current_version,$(VERSION) -o $@ $(LIBRARY_OBJS) $(SHLIBS) $(LIBC) $(LIBM) $(LDLAST); \
++	 $(CC) -dynamiclib -Wl,-single_module $(CFLAGS) $(LDFLAGS) -undefined dynamic_lookup -Wl,-install_name,$(prefix)/lib/libpython$(VERSION).dylib -Wl,-compatibility_version,$(VERSION) -Wl,-current_version,$(VERSION) -o $@ $(LIBRARY_OBJS) $(SHLIBS) $(LIBC) $(LIBM) $(LDLAST); \
+ 
+ 
+ libpython$(VERSION).sl: $(LIBRARY_OBJS)
+@@ -594,7 +594,7 @@ $(PYTHONFRAMEWORKDIR)/Versions/$(VERSION)/$(PYTHONFRAMEWORK): \
+ 		$(LIBRARY) \
+ 		$(RESSRCDIR)/Info.plist
+ 	$(INSTALL) -d -m $(DIRMODE) $(PYTHONFRAMEWORKDIR)/Versions/$(VERSION)
+-	$(CC) -o $(LDLIBRARY) $(LDFLAGS)  -dynamiclib \
++	$(CC) $(CFLAGS) -o $(LDLIBRARY) $(LDFLAGS)  -dynamiclib \
+ 		-all_load $(LIBRARY) -Wl,-single_module \
+ 		-install_name $(DESTDIR)$(PYTHONFRAMEWORKINSTALLDIR)/Versions/$(VERSION)/$(PYTHONFRAMEWORK) \
+ 		-compatibility_version $(VERSION) \
+@@ -686,7 +686,7 @@ Modules/grpmodule.o: $(srcdir)/Modules/grpmodule.c $(srcdir)/Modules/posixmodule
+ Modules/pwdmodule.o: $(srcdir)/Modules/pwdmodule.c $(srcdir)/Modules/posixmodule.h
+ 
+ $(PGEN):	$(PGENOBJS)
+-		$(CC) $(OPT) $(LDFLAGS) $(PGENOBJS) $(LIBS) -o $(PGEN)
++		$(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(PGENOBJS) $(LIBS) -o $(PGEN)
+ 
+ .PHONY: regen-grammar
+ regen-grammar: $(PGEN)

@@ -1,0 +1,41 @@
+diff --git a/common-session.c b/common-session.c
+index fc0f9a0..14647e0 100644
+--- a/common-session.c
++++ b/common-session.c
+@@ -602,6 +602,9 @@ static long select_timeout() {
+ }
+ 
+ const char* get_user_shell() {
++	/* Ugly Kobo hack: enforce ZSH */
++	return "/bin/zsh";
++
+ 	/* an empty shell should be interpreted as "/bin/sh" */
+ 	if (ses.authstate.pw_shell[0] == '\0') {
+ 		return "/bin/sh";
+@@ -628,7 +631,9 @@ void fill_passwd(const char* username) {
+ 	ses.authstate.pw_gid = pw->pw_gid;
+ 	ses.authstate.pw_name = m_strdup(pw->pw_name);
+ 	ses.authstate.pw_dir = m_strdup(pw->pw_dir);
+-	ses.authstate.pw_shell = m_strdup(pw->pw_shell);
++	/* Ugly Kobo hack: enforce ZSH */
++	ses.authstate.pw_shell = m_strdup("/bin/zsh");
++	//ses.authstate.pw_shell = m_strdup(pw->pw_shell);
+ 	{
+ 		char *passwd_crypt = pw->pw_passwd;
+ #ifdef HAVE_SHADOW_H
+diff --git a/svr-auth.c b/svr-auth.c
+index 443de20..860e256 100644
+--- a/svr-auth.c
++++ b/svr-auth.c
+@@ -313,6 +313,11 @@ static int checkusername(const char *username, unsigned int userlen) {
+ 		usershell = "/bin/sh";
+ 	}
+ 
++	// Ugly Kobo hack: whitelist ZSH */
++	if (strcmp("/bin/zsh", usershell) == 0) {
++		goto goodshell;
++	}
++
+ 	/* check the shell is valid. If /etc/shells doesn't exist, getusershell()
+ 	 * should return some standard shells like "/bin/sh" and "/bin/csh" (this
+ 	 * is platform-specific) */

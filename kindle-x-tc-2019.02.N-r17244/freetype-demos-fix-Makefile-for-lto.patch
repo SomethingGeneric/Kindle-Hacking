@@ -1,0 +1,24 @@
+diff --git a/Makefile b/Makefile
+index 3beddde..11cf8b6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -168,6 +168,7 @@ else
+     override CC = $(CCraw)
+     LINK_CMD    = $(subst /,$(SEP),$(OBJ_BUILD)/libtool) \
+                   --mode=link $(CC) \
++                  $(BASE_CPPFLAGS) $(XC_LINKTOOL_CFLAGS) $(BASE_CFLAGS) \
+                   $(subst /,$(COMPILER_SEP),$(LDFLAGS))
+     LINK_LIBS   = $(subst /,$(COMPILER_SEP),$(FTLIB) $(EFENCE)) $(LIB_CLOCK_GETTIME)
+   else
+diff --git a/graph/rules.mk b/graph/rules.mk
+index 8f3e75b..3c3d540 100644
+--- a/graph/rules.mk
++++ b/graph/rules.mk
+@@ -54,6 +54,7 @@ GRAPH_OBJS := $(OBJ_DIR_2)/gblblit.$(O)   \
+ #
+ ifneq ($(LIBTOOL),)
+   COMPILE_GRAPH_LIB = $(LIBTOOL) --mode=link $(CCraw) -static \
++                                 $(BASE_CPPFLAGS) $(XC_LINKTOOL_CFLAGS) $(BASE_CFLAGS) $(BASE_LDFLAGS) \
+                                  -o $(subst /,$(COMPILER_SEP),$@ $(GRAPH_OBJS))
+ else
+   COMPILE_GRAPH_LIB = ar -r $(subst /,$(COMPILER_SEP),$@ $(GRAPH_OBJS))

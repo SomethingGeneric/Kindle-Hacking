@@ -1,0 +1,136 @@
+diff --git a/util-linux/fbset.c b/util-linux/fbset.c
+index 11cb20cb2..cdbda75ec 100644
+--- a/util-linux/fbset.c
++++ b/util-linux/fbset.c
+@@ -53,7 +53,7 @@
+ //usage:       "$ fbset\n"
+ //usage:       "mode \"1024x768-76\"\n"
+ //usage:       "	# D: 78.653 MHz, H: 59.949 kHz, V: 75.694 Hz\n"
+-//usage:       "	geometry 1024 768 1024 768 16\n"
++//usage:       "	geometry 1024 768 1024 768 16 0\n"
+ //usage:       "	timings 12714 128 32 16 4 128 4\n"
+ //usage:       "	accel false\n"
+ //usage:       "	rgba 5/11,6/5,5/0,0/0\n"
+@@ -136,6 +136,8 @@ static NOINLINE void copy_changed_values(
+ 
+ 	if ((int32_t) set->bits_per_pixel > 0) base->bits_per_pixel = set->bits_per_pixel;
+ 	//copy_if_gt0(&set->bits_per_pixel, &base->bits_per_pixel, 1);
++	// grayscale can be 0!
++	if ((int32_t) set->grayscale != (int32_t) base->grayscale) base->grayscale = set->grayscale;
+ 
+ 	//if ((int32_t) set->pixclock > 0)       base->pixclock = set->pixclock;
+ 	//if ((int32_t) set->left_margin > 0)    base->left_margin = set->left_margin;
+@@ -145,8 +147,9 @@ static NOINLINE void copy_changed_values(
+ 	//if ((int32_t) set->hsync_len > 0) base->hsync_len = set->hsync_len;
+ 	//if ((int32_t) set->vsync_len > 0) base->vsync_len = set->vsync_len;
+ 	//if ((int32_t) set->sync > 0)  base->sync = set->sync;
+-	//if ((int32_t) set->vmode > 0) base->vmode = set->vmode;
+-	copy_if_gt0(&set->pixclock, &base->pixclock, 9);
++	copy_if_gt0(&set->pixclock, &base->pixclock, 8);
++	// vmode can be 0!
++	if ((int32_t) set->vmode != (int32_t) base->vmode) base->vmode = set->vmode;
+ }
+ 
+ 
+@@ -187,6 +190,7 @@ enum {
+ 	CMD_RGBA = 117,
+ 	CMD_STEP = 118,
+ 	CMD_MOVE = 119,
++	CMD_GRAY = 120,
+ #endif
+ };
+ 
+@@ -218,7 +222,7 @@ static const struct cmdoptions_t {
+ 	{ "vyres"   , 1, CMD_VYRES    },
+ 	{ "depth"   , 1, CMD_DEPTH    },
+ 	{ "match"   , 0, CMD_MATCH    },
+-	{ "geometry", 5, CMD_GEOMETRY },
++	{ "geometry", 6, CMD_GEOMETRY },
+ 	{ "pixclock", 1, CMD_PIXCLOCK },
+ 	{ "left"    , 1, CMD_LEFT     },
+ 	{ "right"   , 1, CMD_RIGHT    },
+@@ -234,6 +238,7 @@ static const struct cmdoptions_t {
+ 	{ "rgba"    , 1, CMD_RGBA     },
+ 	{ "step"    , 1, CMD_STEP     },
+ 	{ "move"    , 1, CMD_MOVE     },
++	{ "gray"    , 1, CMD_GRAY     },
+ #endif
+ };
+ 
+@@ -261,7 +266,7 @@ static void ss(uint32_t *x, uint32_t flag, char *buf, const char *what)
+ /* Mode db file contains mode definitions like this:
+  * mode "800x600-48-lace"
+  *     # D: 36.00 MHz, H: 33.835 kHz, V: 96.39 Hz
+- *     geometry 800 600 800 600 8
++ *     geometry 800 600 800 600 8 1
+  *     timings 27778 56 80 79 11 128 12
+  *     laced true
+  *     hsync high
+@@ -309,23 +314,27 @@ static int read_mode_db(struct fb_var_screeninfo *base, const char *fn,
+ 		switch (i) {
+ 		case 0:
+ 			if (sizeof(int) == sizeof(base->xres)) {
+-				sscanf(p, "%d %d %d %d %d",
++				sscanf(p, "%d %d %d %d %d %d",
+ 					&base->xres, &base->yres,
+ 					&base->xres_virtual, &base->yres_virtual,
+-					&base->bits_per_pixel);
++					&base->bits_per_pixel,
++					&base->grayscale);
+ 			} else {
+ 				int base_xres, base_yres;
+ 				int base_xres_virtual, base_yres_virtual;
+ 				int base_bits_per_pixel;
+-				sscanf(p, "%d %d %d %d %d",
++				int base_grayscale;
++				sscanf(p, "%d %d %d %d %d %d",
+ 					&base_xres, &base_yres,
+ 					&base_xres_virtual, &base_yres_virtual,
+-					&base_bits_per_pixel);
++					&base_bits_per_pixel,
++					&base_grayscale);
+ 				base->xres = base_xres;
+ 				base->yres = base_yres;
+ 				base->xres_virtual = base_xres_virtual;
+ 				base->yres_virtual = base_yres_virtual;
+ 				base->bits_per_pixel = base_bits_per_pixel;
++				base->grayscale = base_grayscale;
+ 			}
+ //bb_error_msg("GEO[%s]", p);
+ 			break;
+@@ -418,7 +427,7 @@ static NOINLINE void showmode(struct fb_var_screeninfo *v)
+ #if ENABLE_FEATURE_FBSET_FANCY
+ 	"\t# D: %.3f MHz, H: %.3f kHz, V: %.3f Hz\n"
+ #endif
+-	"\tgeometry %u %u %u %u %u\n"
++	"\tgeometry %u %u %u %u %u %u\n"
+ 	"\ttimings %u %u %u %u %u %u %u\n"
+ 	"\taccel %s\n"
+ 	"\trgba %u/%u,%u/%u,%u/%u,%u/%u\n"
+@@ -427,7 +436,7 @@ static NOINLINE void showmode(struct fb_var_screeninfo *v)
+ #if ENABLE_FEATURE_FBSET_FANCY
+ 		drate / 1e6, hrate / 1e3, vrate,
+ #endif
+-		v->xres, v->yres, v->xres_virtual, v->yres_virtual, v->bits_per_pixel,
++		v->xres, v->yres, v->xres_virtual, v->yres_virtual, v->bits_per_pixel, v->grayscale,
+ 		v->pixclock, v->left_margin, v->right_margin, v->upper_margin, v->lower_margin,
+ 			v->hsync_len, v->vsync_len,
+ 		(v->accel_flags > 0 ? "true" : "false"),
+@@ -491,6 +500,7 @@ int fbset_main(int argc, char **argv)
+ 				var_set.xres_virtual = xatou32(argv[3]);
+ 				var_set.yres_virtual = xatou32(argv[4]);
+ 				var_set.bits_per_pixel = xatou32(argv[5]);
++				var_set.grayscale = xatou32(argv[6]);
+ 				break;
+ 			case CMD_TIMING:
+ 				var_set.pixclock = xatou32(argv[1]);
+@@ -519,6 +529,9 @@ int fbset_main(int argc, char **argv)
+ 			case CMD_DEPTH:
+ 				var_set.bits_per_pixel = xatou32(argv[1]);
+ 				break;
++			case CMD_GRAY:
++				var_set.grayscale = xatou32(argv[1]);
++				break;
+ #endif
+ 			}
+ 			switch (g_cmdoptions[i].code) {

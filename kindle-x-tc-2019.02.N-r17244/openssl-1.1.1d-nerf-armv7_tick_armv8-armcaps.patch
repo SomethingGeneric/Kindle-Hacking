@@ -1,0 +1,33 @@
+diff --git a/crypto/armcap.c b/crypto/armcap.c
+index 58e54f0da2..9ba33b716e 100644
+--- a/crypto/armcap.c
++++ b/crypto/armcap.c
+@@ -178,6 +178,8 @@ void OPENSSL_cpuid_setup(void)
+     if (sigsetjmp(ill_jmp, 1) == 0) {
+         _armv7_neon_probe();
+         OPENSSL_armcap_P |= ARMV7_NEON;
++        // Kindle Hack: We're on ARMv7, so nerf this to avoid spamming dmesg w/ undefined instructions...
++        /*
+         if (sigsetjmp(ill_jmp, 1) == 0) {
+             _armv8_pmull_probe();
+             OPENSSL_armcap_P |= ARMV8_PMULL | ARMV8_AES;
+@@ -199,14 +201,19 @@ void OPENSSL_cpuid_setup(void)
+             OPENSSL_armcap_P |= ARMV8_SHA512;
+         }
+ #  endif
++        */
+     }
+ # endif
+ 
+     /* Things that getauxval didn't tell us */
++    // Kindle Hack: Apparently, the kernel doesn't enable this part of the PMU for userland on the PW2's A9 (at least on FW 5.4.2).
++    // Thus this throws an (handled) SIGILL. Nerf for now, to avoid spamming dmesg with 'undefined instruction' logs.
++    /*
+     if (sigsetjmp(ill_jmp, 1) == 0) {
+         _armv7_tick();
+         OPENSSL_armcap_P |= ARMV7_TICK;
+     }
++    */
+ 
+     sigaction(SIGILL, &ill_oact, NULL);
+     sigprocmask(SIG_SETMASK, &oset, NULL);

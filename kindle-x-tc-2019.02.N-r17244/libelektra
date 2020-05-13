@@ -1,0 +1,28 @@
+
+git clone git://gitorious.org/elektra-initiative/libelektra.git
+cd libelektra
+
+mkdir -p build-x86
+mkdir -p build-arm
+
+cd build-x86
+env CFLAGS="-O2 -march=native -fomit-frame-pointer" CXXFLAGS="-O2 -march=native -fomit-frame-pointer" cmake -DCMAKE_BUILD_TYPE="Release" -DKDB_DB_SYSTEM="/mnt/us/extensions/system/var/registry" -DCMAKE_INSTALL_PREFIX="${TC_BUILD_DIR}" -DBUILD_DOCUMENTATION=OFF -DENABLE_TESTING=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF -DINSTALL_TESTING=OFF ..
+make exporterrors
+make exportsymbols
+cd ..
+
+export LDFLAGS="${BASE_LDFLAGS} -static-libstdc++"
+
+# Don't want the c99 scanf family on the K3 (@GLIBC_2.7), use the GNU extensions instead
+# Doesn't honor CPPFLAGS...
+export CFLAGS="-D_GNU_SOURCE ${BASE_CFLAGS}"
+# Awful patch, this relies on the bahviour of the XSI/POSIX compliant version of strerror_r
+sed -e 's/#error "Something turned _GNU_SOURCE on, this breaks strerror_r!"/#undef _GNU_SOURCE/' -i src/plugins/resolver/resolver.c
+
+cd build-arm
+cmake -DCMAKE_TOOLCHAIN_FILE=${SVN_ROOT}/Configs/trunk/Kindle/Misc/CMakeCross.txt -DEXE_SYM_LOC="../build-x86/src/libelektra/exportsymbols" -DEXE_LOC="../build-x86/src/error/exporterrors" -DCMAKE_BUILD_TYPE="Release" -DKDB_DB_SYSTEM="/mnt/us/extensions/systems/var/registry" -DCMAKE_INSTALL_PREFIX="${TC_BUILD_DIR}/elektra-sysroot" -DBUILD_DOCUMENTATION=OFF -DENABLE_TESTING=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF -DINSTALL_TESTING=OFF -DPLUGINS=NODEP -DBUILD_STATIC=ON -BUILD_SHARED=OFF -DBUILD_FULL=OFF ..
+make -j2 VERBOSE=1
+make install/strip
+
+export CFLAGS="${BASE_CFLAGS}"
+export LDFLAGS="${BASE_LDFLAGS}"

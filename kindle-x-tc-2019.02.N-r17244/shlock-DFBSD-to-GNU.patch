@@ -1,0 +1,55 @@
+--- shlock.c.ori	2020-02-03 02:59:33.846254345 +0100
++++ shlock.c	2020-02-03 03:10:45.078246817 +0100
+@@ -34,6 +34,8 @@
+  * $DragonFly: src/usr.bin/shlock/shlock.c,v 1.1 2005/07/23 19:47:15 joerg Exp $
+  */
+ 
++#define _GNU_SOURCE
++
+ #include <sys/types.h>
+ #include <err.h>
+ #include <errno.h>
+@@ -111,7 +113,7 @@ create_lock(const char *file, pid_t pid,
+ 		err(1, "snprintf() failed"); /* Must not happen. */
+ 
+ 	tmpbuf = strdup(file);
+-	if ((dir = dirname(tmpbuf)) == NULL)
++	if ((dir = dirname(tmpbuf)) == NULL)	/* NOTE: The GNU POSIX implementation actually *never* returns a NULL pointer */
+ 		err(1, "dirname() failed");
+ 
+ 	ret = snprintf(tmpf, sizeof(tmpf), "%s/shlock%ld", dir, (long)getpid());
+@@ -121,7 +123,7 @@ create_lock(const char *file, pid_t pid,
+ 
+ 	if (debug) {
+ 		printf("%s: trying lock file %s for process %ld\n",
+-		       getprogname(), file, (long)pid);
++		       program_invocation_short_name, file, (long)pid);
+ 	}
+ 
+ 	while ((fd = open(tmpf, O_RDWR | O_CREAT | O_EXCL, 0644)) == -1){
+@@ -167,7 +169,7 @@ create_lock(const char *file, pid_t pid,
+ 			return(1); /* Lock file is valid. */
+ 		}
+ 		if (unlink(file) == 0) {
+-			printf("%s: stale lock file removed\n", getprogname());
++			printf("%s: stale lock file removed\n", program_invocation_short_name);
+ 			continue;
+ 		}
+ 		if (unlink(tmpf)) {
+@@ -178,7 +180,7 @@ create_lock(const char *file, pid_t pid,
+ 	}
+ 
+ 	if (debug)
+-		printf("%s: lock successfully obtained\n", getprogname());
++		printf("%s: lock successfully obtained\n", program_invocation_short_name);
+ 
+ 	if (unlink(tmpf))
+ 		warn("could not remove temporary lock file %s", tmpf);
+@@ -264,6 +266,6 @@ check_lock(const char *file, int uucpsty
+ static void
+ usage(void)
+ {
+-	fprintf(stderr, "%s [-u] [-d] [-p pid] -f file\n", getprogname());
++	fprintf(stderr, "%s [-u] [-d] [-p pid] -f file\n", program_invocation_short_name);
+ 	exit(1);
+ }

@@ -1,0 +1,43 @@
+# to avoid networking dying try this
+/mnt/us/usbnet/bin/usbnet-enable
+# not sure if this is necessary:
+/etc/init.d.framework stop
+mntroot rw
+# then add a sensible dns server like 4.2.2.1
+vi /etc/resolv.conf
+# for some reason this last step seems to undo itself periodically?
+route add default gw 192.168.2.1
+# to check the routing was added, use
+route -n
+# some say you need this, I'm not sure
+/etc/init.d/netwatchd stop
+
+
+
+
+## Now from tge post once ready
+
+
+
+
+# mount it on kindle
+# I put all this in an init script called /etc/init.t/debian start
+mount -o loop -t ext3 /mnt/us/debian.ext3 /mnt/debian
+# or in fstab later on the Kindle -- not sure if this works?
+#/mnt/us/debian.ext3 /mnt/debian ext3 loop,sync,noatime 0 0
+
+# prepare filesystem for chroot
+mount -o bind /dev /mnt/debian/dev
+mount -o bind /proc /mnt/debian/proc
+mount -o bind /sys /mnt/debian/sys
+
+# or, if you were using a different kernel
+#mount proc /mnt/debian/proc -t proc
+#mount sysfs /mnt/debian/sys -t sysfs
+#mount devfs /mnt/debian/dev -t dev
+
+cp /etc/hosts /mnt/debian/etc/hosts
+cp /etc/resolv.conf /mnt/debian/etc/resolv.conf
+
+# get a shell on your new system
+chroot /mnt/debian /bin/bash

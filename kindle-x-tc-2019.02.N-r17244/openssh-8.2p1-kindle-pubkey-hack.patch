@@ -1,0 +1,100 @@
+diff --git a/auth.c b/auth.c
+index a267353c..7bfe2da0 100644
+--- a/auth.c
++++ b/auth.c
+@@ -153,9 +153,8 @@ allowed_user(struct ssh *ssh, struct passwd * pw)
+ 		free((void *) passwd);
+ #endif /* USE_LIBIAF */
+ 		if (locked) {
+-			logit("User %.100s not allowed because account is locked",
++			logit("User %.100s should not be allowed because account is locked, but we're a nice Kindle ;)",
+ 			    pw->pw_name);
+-			return 0;
+ 		}
+ 	}
+ 
+@@ -424,28 +423,10 @@ auth_root_allowed(struct ssh *ssh, const char *method)
+  * This returns a buffer allocated by xmalloc.
+  */
+ char *
+-expand_authorized_keys(const char *filename, struct passwd *pw)
++expand_authorized_keys(const char *filename __attribute__((unused)), struct passwd *pw __attribute__((unused)))
+ {
+-	char *file, uidstr[32], ret[PATH_MAX];
+-	int i;
+-
+-	snprintf(uidstr, sizeof(uidstr), "%llu",
+-	    (unsigned long long)pw->pw_uid);
+-	file = percent_expand(filename, "h", pw->pw_dir,
+-	    "u", pw->pw_name, "U", uidstr, (char *)NULL);
+-
+-	/*
+-	 * Ensure that filename starts anchored. If not, be backward
+-	 * compatible and prepend the '%h/'
+-	 */
+-	if (path_absolute(file))
+-		return (file);
+-
+-	i = snprintf(ret, sizeof(ret), "%s/%s", pw->pw_dir, file);
+-	if (i < 0 || (size_t)i >= sizeof(ret))
+-		fatal("expand_authorized_keys: path too long");
+-	free(file);
+-	return (xstrdup(ret));
++	// Kindle Hack: Store our authorized keys in a single file in the userstore
++	return (xstrdup("/mnt/us/usbnet/etc/authorized_keys"));
+ }
+ 
+ char *
+@@ -473,12 +454,11 @@ check_key_in_hostfiles(struct passwd *pw, struct sshkey *key, const char *host,
+ 		user_hostfile = tilde_expand_filename(userfile, pw->pw_uid);
+ 		if (options.strict_modes &&
+ 		    (stat(user_hostfile, &st) == 0) &&
+-		    ((st.st_uid != 0 && st.st_uid != pw->pw_uid) ||
+-		    (st.st_mode & 022) != 0)) {
++		    (st.st_uid != 0 && st.st_uid != pw->pw_uid)) {
+ 			logit("Authentication refused for %.100s: "
+-			    "bad owner or modes for %.200s",
++			    "bad owner for %.200s",
+ 			    pw->pw_name, user_hostfile);
+-			auth_debug_add("Ignored %.200s: bad ownership or modes",
++			auth_debug_add("Ignored %.200s: bad ownership",
+ 			    user_hostfile);
+ 		} else {
+ 			temporarily_use_uid(pw);
+diff --git a/authfile.c b/authfile.c
+index 20b66d9b..05e38cdf 100644
+--- a/authfile.c
++++ b/authfile.c
+@@ -87,30 +87,9 @@ sshkey_save_private(struct sshkey *key, const char *filename,
+ 
+ /* XXX remove error() calls from here? */
+ int
+-sshkey_perm_ok(int fd, const char *filename)
++sshkey_perm_ok(int fd __attribute__((unused)), const char *filename __attribute__((unused)))
+ {
+-	struct stat st;
+-
+-	if (fstat(fd, &st) == -1)
+-		return SSH_ERR_SYSTEM_ERROR;
+-	/*
+-	 * if a key owned by the user is accessed, then we check the
+-	 * permissions of the file. if the key owned by a different user,
+-	 * then we don't care.
+-	 */
+-#ifdef HAVE_CYGWIN
+-	if (check_ntsec(filename))
+-#endif
+-	if ((st.st_uid == getuid()) && (st.st_mode & 077) != 0) {
+-		error("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+-		error("@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @");
+-		error("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+-		error("Permissions 0%3.3o for '%s' are too open.",
+-		    (u_int)st.st_mode & 0777, filename);
+-		error("It is required that your private key files are NOT accessible by others.");
+-		error("This private key will be ignored.");
+-		return SSH_ERR_KEY_BAD_PERMISSIONS;
+-	}
++	// Kindle Hack: Don't check key perms, they're in a single file in the userstore
+ 	return 0;
+ }
+ 

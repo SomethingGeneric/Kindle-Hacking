@@ -1,0 +1,139 @@
+diff --git a/maint/ioctls_sym.sh b/maint/ioctls_sym.sh
+index cc17da79..29b324ac 100755
+--- a/maint/ioctls_sym.sh
++++ b/maint/ioctls_sym.sh
+@@ -104,7 +104,6 @@ process_file()
+ 
+ 	# Common code for every processed file.
+ 	cat > "$tmpdir"/printents.c <<__EOF__
+-#include <linux/compiler_attributes.h>
+ #include <asm/termbits.h>
+ #include <asm/ioctl.h>
+ #include <linux/types.h>
+@@ -209,6 +208,15 @@ __EOF__
+ 		*linux/auto_fs*.h)
+ 			echo 'typedef u32 compat_ulong_t;'
+ 			;;
++		*linux/ext2_fs.h)
++			echo '#include <linux/fs.h>'
++			;;
++		*linux/btrfs.h)
++			cat <<'__EOF__'
++struct btrfs_ioctl_defrag_range_args { __u32 unused[12]; };
++#define BTRFS_LABEL_SIZE 256
++__EOF__
++			;;
+ 		*linux/coda.h|*android_alarm.h)
+ 			cat <<'__EOF__'
+ #ifndef _LINUX_TIME_H
+@@ -229,7 +237,35 @@ __EOF__
+ 			echo '#define PAGE_SIZE 0'
+ 			;;
+ 		*linux/if_pppox.h)
+-			echo '#include <netinet/in.h>'
++			cat <<'__EOF__'
++#include <linux/if.h>
++#include <linux/in.h>
++#include <linux/in6.h>
++#include <linux/if_ether.h>
++__EOF__
++			;;
++		*linux/if_ppp.h)
++			cat <<'__EOF__'
++#define aligned_u64 __u64 __attribute__((aligned(8)))
++#include <linux/if.h>
++#include <linux/ppp_defs.h>
++#include <linux/filter.h>
++__EOF__
++			;;
++		*linux/omap3isp.h)
++			echo '#include <linux/videodev2.h>'
++			;;
++		*linux/meye.h)
++			# Is stupid, depending on kernel...
++			return 0
++			echo '#include <linux/videodev.h>'
++			;;
++		*pcmcia/ds.h)
++			cat <<'__EOF__'
++#include <pcmcia/cs_types.h>
++#include <pcmcia/cistpl.h>
++#include <pcmcia/cs.h>
++__EOF__
+ 			;;
+ 		*linux/if_tun.h|*linux/ppp-ioctl.h)
+ 			echo '#include <linux/filter.h>'
+@@ -237,15 +273,27 @@ __EOF__
+ 		*linux/isdn_ppp.h|*linux/gsmmux.h)
+ 			echo '#include <linux/if.h>'
+ 			;;
+-		*media*/saa6588.h)
++		*media*/saa6588.h | *media*/rds.h)
+ 			echo 'typedef struct poll_table_struct poll_table;'
+ 			;;
+-		*linux/ivtvfb.h|*linux/meye.h|*media/*.h)
++		*linux/ivtvfb.h|*linux/meye.h|*media/*.h|*linux/mxc_v4l2.h)
+ 			echo '#include <linux/videodev2.h>'
+ 			;;
++		*linux/mxc_vpu.h)
++			echo 'typedef u32 dma_addr_t;'
++			;;
++		*linux/pxp_dma.h)
++			# Duplicate defs. w/ linux/pxp_device.h
++			return 0
++			;;
++		*linux/pxp_device.h)
++			echo 'typedef unsigned long dma_addr_t;'
++			;;
+ 		*linux/kvm.h)
++			# Basically a mess because x-compile, and I don't care.
++			return 0
+ 			case "$uname_m" in
+-				i?86|x86_64|aarch64|arm*|mips*|ppc*|s390*) ;;
++				i?86|x86_64|aarch64|mips*|ppc*|s390*) ;;
+ 				*) return 0 ;; # not applicable
+ 			esac
+ 			;;
+@@ -346,6 +394,10 @@ s/^\(#define .*)\),$/\1/
+ s/^\(#define .*,\)$/\1 \\/
+ s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
+ 			;;
++		*drm/*_drm.h | *media/ovcamchip.h)
++			# Is stupid
++			return 0
++			;;
+ 		*drm/r128_drm.h)
+ 			# Filter out the code that references unknown types.
+ 			sed '/drm_r128_clear2_t/d' < "$s" > "$tmpdir/$f"
+@@ -364,13 +416,21 @@ s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
+ 			# Create the file it attempts to include.
+ 			touch "$tmpdir/asm/bug.h"
+ 			;;
++		*linux/ipu.h | *linux/pxp_dma.h )
++			# Filter out stupid typedef
++			sed 's#typedef unsigned char bool;#//typedef unsigned char bool;#' < "$s" > "$tmpdir/$f"
++			;;
++		*linux/pxp_device.h)
++			# Filter out pxp_dma.h include, which we've already parsed, to avoid duplicate definitions...
++			sed 's%#include <linux/pxp_dma.h>%//#include <linux/pxp_dma.h>%' < "$s" > "$tmpdir/$f"
++			;;
+ 		*linux/vmw_vmci_defs.h)
+ 			# Fetch ioctl macros only.
+ 			grep "${r_define}I" < "$s" > "$tmpdir/$f"
+ 			;;
+ 		*media/v4l2-common.h)
+ 			# Fetch one piece of code containing ioctls definitions.
+-			sed -n '/\* s_config \*/,/ ---/p' < "$s" >> "$tmpdir/$f"
++			sed -n '/ remaining ioctls/,/ ---/p' < "$s" > "$tmpdir/$f"
+ 			;;
+ 		*media/v4l2-ioctl.h)
+ 			echo 'struct old_timespec32 {int32_t dummy[2];};' >> "$tmpdir/$f"
+@@ -409,7 +469,7 @@ s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
+ 			s390_list='KVM_S390_[A-Z_]+'
+ 			x86_list='KVM_GET_CPUID2|KVM_GET_DEBUGREGS|KVM_GET_EMULATED_CPUID|KVM_GET_LAPIC|KVM_GET_MSRS|KVM_GET_MSR_FEATURE_INDEX_LIST|KVM_GET_MSR_INDEX_LIST|KVM_GET_NESTED_STATE|KVM_GET_PIT|KVM_GET_PIT2|KVM_GET_SUPPORTED_CPUID|KVM_GET_SUPPORTED_HV_CPUID|KVM_GET_VCPU_EVENTS|KVM_GET_XCRS|KVM_GET_XSAVE|KVM_HYPERV_EVENTFD|KVM_SET_CPUID|KVM_SET_CPUID2|KVM_SET_DEBUGREGS|KVM_SET_LAPIC|KVM_SET_MEMORY_ALIAS|KVM_SET_MSRS|KVM_SET_NESTED_STATE|KVM_SET_PIT|KVM_SET_PIT2|KVM_SET_PMU_EVENT_FILTER|KVM_SET_VCPU_EVENTS|KVM_SET_XCRS|KVM_SET_XSAVE|KVM_XEN_HVM_CONFIG|KVM_X86_[A-Z_]+'
+ 			case "$uname_m" in
+-				aarch64|arm*) list="$ppc_list|$s390_list|$x86_list" ;;
++				aarch64) list="$ppc_list|$s390_list|$x86_list" ;;
+ 				ppc*) list="$arm_list|$s390_list|$x86_list" ;;
+ 				s390*) list="$arm_list|$ppc_list|$x86_list" ;;
+ 				i?86|x86_64*) list="$arm_list|$ppc_list|$s390_list" ;;

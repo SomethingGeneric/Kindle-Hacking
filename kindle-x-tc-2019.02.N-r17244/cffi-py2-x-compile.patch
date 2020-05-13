@@ -1,0 +1,18 @@
+diff --git a/setup.py b/setup.py
+index e1dd39dc..cb7c10e2 100644
+--- a/setup.py
++++ b/setup.py
+@@ -66,8 +66,11 @@ def no_working_compiler_found():
+ 
+ def get_config():
+     from distutils.core import Distribution
+-    from distutils.sysconfig import get_config_vars
+-    get_config_vars()      # workaround for a bug of distutils, e.g. on OS/X
++    from distutils import sysconfig
++    sysconfig.get_config_vars()      # workaround for a bug of distutils, e.g. on OS/X
++    sysconfig._config_vars['CFLAGS'] = sysconfig._config_vars['CFLAGS'].replace("-march=native", "")
++    sysconfig._config_vars['PY_CFLAGS'] = sysconfig._config_vars['PY_CFLAGS'].replace("-march=native", "")
++    sysconfig._config_vars['CONFIG_ARGS'] = sysconfig._config_vars['CONFIG_ARGS'].replace("-march=native", "")
+     config = Distribution().get_command_obj('config')
+     return config
+ 

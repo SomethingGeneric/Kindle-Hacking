@@ -1,0 +1,44 @@
+diff --git a/linux/drv_display_sun4i.h b/linux/drv_display_sun4i.h
+new file mode 100644
+index 00000000..e7b1ae26
+--- /dev/null
++++ b/linux/drv_display_sun4i.h
+@@ -0,0 +1,11 @@
++// Pulled from the real <linux/drv_display_sun4i.h>
++// enum -> define conversion to make strace's scripts happy.
++
++#define DISP_CMD_EINK_INIT		0x0400
++#define DISP_CMD_EINK_UNINIT		0x0401
++#define DISP_CMD_EINK_UPDATE		0x0402
++#define DISP_CMD_EINK_SET_MODE		0x0403
++#define DISP_CMD_EINK_SET_TEMPERATURE	0x0404
++#define DISP_CMD_EINK_GET_UPDATE_STATUS	0x0405
++#define DISP_CMD_SET_3V3		0x0407
++
+diff --git a/maint/ioctls_gen.sh b/maint/ioctls_gen.sh
+index e102f017..0d1a8d2f 100755
+--- a/maint/ioctls_gen.sh
++++ b/maint/ioctls_gen.sh
+@@ -61,6 +61,7 @@ trap 'cleanup 1' HUP PIPE INT QUIT TERM
+ 	"$mydir"/ioctls_hex.sh "$inc_dir" '7[12]' linux/videotext.h
+ 	"$mydir"/ioctls_hex.sh "$inc_dir" 89 asm/sockios.h asm-generic/sockios.h linux/sockios.h
+ 	"$mydir"/ioctls_hex.sh "$inc_dir" 8B linux/wireless.h
++	"$mydir"/ioctls_hex.sh "${mydir}/.." 04 linux/drv_display_sun4i.h
+ } > ioctls_hex.h
+ msg "generated $(grep -c '^{' ioctls_hex.h) hex ioctls from $inc_dir"
+ 
+diff --git a/maint/ioctls_sym.sh b/maint/ioctls_sym.sh
+index 29b324ac..cb700561 100755
+--- a/maint/ioctls_sym.sh
++++ b/maint/ioctls_sym.sh
+@@ -412,6 +412,10 @@ s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
+ 			# Filter out the code that references unknown types.
+ 			sed '/^struct via_file_private/,/^}/d' < "$s" > "$tmpdir/$f"
+ 			;;
++		*linux/android_pmem.h)
++			# Fetch macros only.
++			grep "${r_define}${r_cmd_name}" < "$s" > "$tmpdir/$f"
++			;;
+ 		*linux/nilfs2_fs.h)
+ 			# Create the file it attempts to include.
+ 			touch "$tmpdir/asm/bug.h"

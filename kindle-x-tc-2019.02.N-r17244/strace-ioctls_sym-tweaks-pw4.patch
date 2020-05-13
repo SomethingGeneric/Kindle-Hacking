@@ -1,0 +1,26 @@
+diff --git a/maint/ioctls_sym.sh b/maint/ioctls_sym.sh
+index c737f8a4..5c4c4e4c 100755
+--- a/maint/ioctls_sym.sh
++++ b/maint/ioctls_sym.sh
+@@ -252,6 +252,10 @@ __EOF__
+ 			return 0
+ 			echo '#include <linux/videodev.h>'
+ 			;;
++		*linux/tee.h)
++			# Non-standard syntax for align() attributes on strcuts...
++			return 0
++			;;
+ 		*pcmcia/ds.h)
+ 			cat <<'__EOF__'
+ #include <pcmcia/cs_types.h>
+@@ -401,6 +405,10 @@ s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
+ 			# Filter out the code that references unknown types.
+ 			sed '/^struct via_file_private/,/^}/d' < "$s" > "$tmpdir/$f"
+ 			;;
++		*linux/frontlight.h)
++			# Fetch macros only.
++			grep "${r_define}${r_cmd_name}" < "$s" > "$tmpdir/$f"
++			;;
+ 		*linux/nilfs2_fs.h)
+ 			# Create the file it attempts to include.
+ 			touch "$tmpdir/asm/bug.h"

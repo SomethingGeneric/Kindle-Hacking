@@ -1,0 +1,31 @@
+diff --git a/svr-runopts.c b/svr-runopts.c
+index 58f9d8b..688393d 100644
+--- a/svr-runopts.c
++++ b/svr-runopts.c
+@@ -96,7 +96,7 @@ static void printhelp(const char * progname) {
+ 					"		(default port is %s if none specified)\n"
+ 					"-P PidFile	Create pid file PidFile\n"
+ 					"		(default %s)\n"
+-					"-n             Disable password checking (/!\\ Kindle hack, don't use this!)\n"
++					"-n             Enable password checking (/!\\ Use this to disable the Kindle hack!)\n"
+ #if INETD_MODE
+ 					"-i		Start for inetd\n"
+ #endif
+@@ -165,7 +165,7 @@ void svr_getopts(int argc, char ** argv) {
+ 	svr_opts.hostkey = NULL;
+ 	svr_opts.delay_hostkey = 0;
+ 	svr_opts.pidfile = DROPBEAR_PIDFILE;
+-	svr_opts.nopasschk = 0;
++	svr_opts.nopasschk = 1;
+ #if DROPBEAR_SVR_LOCALTCPFWD
+ 	svr_opts.nolocaltcp = 0;
+ #endif
+@@ -251,7 +251,7 @@ void svr_getopts(int argc, char ** argv) {
+ 					next = &svr_opts.pidfile;
+ 					break;
+ 				case 'n':
+-					svr_opts.nopasschk = 1;
++					svr_opts.nopasschk = 0;
+ 					break;
+ #if DO_MOTD
+ 				/* motd is displayed by default, -m turns it off */

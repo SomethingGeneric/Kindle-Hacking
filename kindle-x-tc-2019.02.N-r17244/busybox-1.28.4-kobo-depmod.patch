@@ -1,0 +1,30 @@
+--- busybox-1.28.4/modutils/depmod.c	2018-03-26 01:59:01.000000000 +0200
++++ busybox-1.28.4-kobo/modutils/depmod.c	2018-06-10 15:15:11.861484923 +0200
+@@ -174,9 +174,7 @@ int depmod_main(int argc UNUSED_PARAM, c
+ 	module_entry *m, *dep;
+ 	const char *moddir_base = "/";
+ 	char *moddir, *version;
+-	struct utsname uts;
+ 	unsigned i;
+-	int tmp;
+ 
+ 	getopt32(argv, "aAb:eF:nruqC:", &moddir_base, NULL, NULL);
+ 	argv += optind;
+@@ -184,15 +182,8 @@ int depmod_main(int argc UNUSED_PARAM, c
+ 	/* goto modules location */
+ 	xchdir(moddir_base);
+ 
+-	/* If a version is provided, then that kernel version's module directory
+-	 * is used, rather than the current kernel version (as returned by
+-	 * "uname -r").  */
+-	if (*argv && sscanf(*argv, "%u.%u.%u", &tmp, &tmp, &tmp) == 3) {
+-		version = *argv++;
+-	} else {
+-		uname(&uts);
+-		version = uts.release;
+-	}
++	/* Kobo attitude... */
++	version = getenv("PLATFORM");
+ 	moddir = concat_path_file(&CONFIG_DEFAULT_MODULES_DIR[1], version);
+ 	xchdir(moddir);
+ 	if (ENABLE_FEATURE_CLEAN_UP)

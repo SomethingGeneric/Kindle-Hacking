@@ -1,0 +1,13 @@
+diff --git a/magick/composite.c b/magick/composite.c
+index 3c8a9db06..b7be8d4f2 100644
+--- a/magick/composite.c
++++ b/magick/composite.c
+@@ -1648,7 +1648,7 @@ MagickExport MagickBooleanType CompositeImageChannel(Image *image,
+   source_image=CloneImage(composite,0,0,MagickTrue,exception);
+   if (source_image == (const Image *) NULL)
+     return(MagickFalse);
+-  if (IsGrayColorspace(image->colorspace) == MagickFalse)
++  if (IsGrayColorspace(image->colorspace) != MagickFalse)
+     (void) SetImageColorspace(image,sRGBColorspace);
+   (void) SetImageColorspace(source_image,image->colorspace);
+   GetMagickPixelPacket(image,&zero);

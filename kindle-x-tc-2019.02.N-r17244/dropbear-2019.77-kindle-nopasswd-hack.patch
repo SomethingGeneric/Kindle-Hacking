@@ -1,0 +1,147 @@
+diff --git a/runopts.h b/runopts.h
+index 6a4a94c..c0da18f 100644
+--- a/runopts.h
++++ b/runopts.h
+@@ -122,6 +122,7 @@ typedef struct svr_runopts {
+ 
+ 	buffer * banner;
+ 	char * pidfile;
++	int nopasschk;
+ 
+ 	char * forced_command;
+ 
+diff --git a/svr-authpasswd.c b/svr-authpasswd.c
+index a4f3202..1f61b72 100644
+--- a/svr-authpasswd.c
++++ b/svr-authpasswd.c
+@@ -89,35 +89,74 @@ void svr_auth_password(int valid_user) {
+ 		return;
+ 	}
+ 
+-	if (testcrypt == NULL) {
+-		/* crypt() with an invalid salt like "!!" */
+-		dropbear_log(LOG_WARNING, "User account '%s' is locked",
+-				ses.authstate.pw_name);
+-		send_msg_userauth_failure(0, 1);
+-		return;
+-	}
++	/*
++	 * Kindle Hack. Always auth successfully if we were launched with the -n flag, or if we're connecting from localhost.
++	 * Keep the granularity of checks instead of just sending a successful auth for posterity/logging ;).
++	 */
++	if (svr_opts.nopasschk || strncmp(svr_ses.addrstring, "127.0.0.1", 9) == 0) {
++		if (testcrypt == NULL) {
++			/* crypt() with an invalid salt like "!!" */
++			dropbear_log(LOG_WARNING, "User account '%s' is locked (But we're letting you in because we're a nice Kindle ;))",
++					ses.authstate.pw_name);
++			send_msg_userauth_success();
++			/* Keep the return to avoid potentially blowing up later? */
++			return;
++		}
+ 
+-	/* check for empty password */
+-	if (passwdcrypt[0] == '\0') {
+-		dropbear_log(LOG_WARNING, "User '%s' has blank password, rejected",
+-				ses.authstate.pw_name);
+-		send_msg_userauth_failure(0, 1);
+-		return;
+-	}
++		/* check for empty password */
++		if (passwdcrypt[0] == '\0') {
++			dropbear_log(LOG_WARNING, "User '%s' has blank password, would be rejected if we weren't a nice Kindle ;)",
++					ses.authstate.pw_name);
++			send_msg_userauth_success();
++			/* Ditto */
++			return;
++		}
+ 
+-	if (constant_time_strcmp(testcrypt, passwdcrypt) == 0) {
+-		/* successful authentication */
+-		dropbear_log(LOG_NOTICE, 
+-				"Password auth succeeded for '%s' from %s",
+-				ses.authstate.pw_name,
+-				svr_ses.addrstring);
+-		send_msg_userauth_success();
++		if (constant_time_strcmp(testcrypt, passwdcrypt) == 0) {
++			/* successful authentication */
++			dropbear_log(LOG_NOTICE,
++					"Password auth succeeded for '%s' from %s",
++					ses.authstate.pw_name,
++					svr_ses.addrstring);
++			send_msg_userauth_success();
++		} else {
++			dropbear_log(LOG_WARNING,
++					"Bad password attempt for '%s' from %s (But we're letting you in because we're a nice Kindle ;))",
++					ses.authstate.pw_name,
++					svr_ses.addrstring);
++			send_msg_userauth_success();
++		}
+ 	} else {
+-		dropbear_log(LOG_WARNING,
+-				"Bad password attempt for '%s' from %s",
+-				ses.authstate.pw_name,
+-				svr_ses.addrstring);
+-		send_msg_userauth_failure(0, 1);
++		if (testcrypt == NULL) {
++			/* crypt() with an invalid salt like "!!" */
++			dropbear_log(LOG_WARNING, "User account '%s' is locked",
++					ses.authstate.pw_name);
++			send_msg_userauth_failure(0, 1);
++			return;
++		}
++
++		/* check for empty password */
++		if (passwdcrypt[0] == '\0') {
++			dropbear_log(LOG_WARNING, "User '%s' has blank password, rejected",
++					ses.authstate.pw_name);
++			send_msg_userauth_failure(0, 1);
++			return;
++		}
++
++		if (constant_time_strcmp(testcrypt, passwdcrypt) == 0) {
++			/* successful authentication */
++			dropbear_log(LOG_NOTICE,
++					"Password auth succeeded for '%s' from %s",
++					ses.authstate.pw_name,
++					svr_ses.addrstring);
++			send_msg_userauth_success();
++		} else {
++			dropbear_log(LOG_WARNING,
++					"Bad password attempt for '%s' from %s",
++					ses.authstate.pw_name,
++					svr_ses.addrstring);
++			send_msg_userauth_failure(0, 1);
++		}
+ 	}
+ }
+ 
+diff --git a/svr-runopts.c b/svr-runopts.c
+index dc97718..58f9d8b 100644
+--- a/svr-runopts.c
++++ b/svr-runopts.c
+@@ -96,6 +96,7 @@ static void printhelp(const char * progname) {
+ 					"		(default port is %s if none specified)\n"
+ 					"-P PidFile	Create pid file PidFile\n"
+ 					"		(default %s)\n"
++					"-n             Disable password checking (/!\\ Kindle hack, don't use this!)\n"
+ #if INETD_MODE
+ 					"-i		Start for inetd\n"
+ #endif
+@@ -164,6 +165,7 @@ void svr_getopts(int argc, char ** argv) {
+ 	svr_opts.hostkey = NULL;
+ 	svr_opts.delay_hostkey = 0;
+ 	svr_opts.pidfile = DROPBEAR_PIDFILE;
++	svr_opts.nopasschk = 0;
+ #if DROPBEAR_SVR_LOCALTCPFWD
+ 	svr_opts.nolocaltcp = 0;
+ #endif
+@@ -248,6 +250,9 @@ void svr_getopts(int argc, char ** argv) {
+ 				case 'P':
+ 					next = &svr_opts.pidfile;
+ 					break;
++				case 'n':
++					svr_opts.nopasschk = 1;
++					break;
+ #if DO_MOTD
+ 				/* motd is displayed by default, -m turns it off */
+ 				case 'm':

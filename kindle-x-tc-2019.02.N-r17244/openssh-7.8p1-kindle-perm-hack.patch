@@ -1,0 +1,108 @@
+diff --git a/auth-rhosts.c b/auth-rhosts.c
+index 57296e1f..f8099d3f 100644
+--- a/auth-rhosts.c
++++ b/auth-rhosts.c
+@@ -261,12 +261,11 @@ auth_rhosts2(struct passwd *pw, const char *client_user, const char *hostname,
+ 		return 0;
+ 	}
+ 	if (options.strict_modes &&
+-	    ((st.st_uid != 0 && st.st_uid != pw->pw_uid) ||
+-	    (st.st_mode & 022) != 0)) {
++	    (st.st_uid != 0 && st.st_uid != pw->pw_uid)) {
+ 		logit("Rhosts authentication refused for %.100s: "
+-		    "bad ownership or modes for home directory.", pw->pw_name);
++		    "bad ownership for home directory.", pw->pw_name);
+ 		auth_debug_add("Rhosts authentication refused for %.100s: "
+-		    "bad ownership or modes for home directory.", pw->pw_name);
++		    "bad ownership for home directory.", pw->pw_name);
+ 		return 0;
+ 	}
+ 	/* Temporarily use the user's uid. */
+@@ -288,11 +287,10 @@ auth_rhosts2(struct passwd *pw, const char *client_user, const char *hostname,
+ 		 * allowing access to their account by anyone.
+ 		 */
+ 		if (options.strict_modes &&
+-		    ((st.st_uid != 0 && st.st_uid != pw->pw_uid) ||
+-		    (st.st_mode & 022) != 0)) {
+-			logit("Rhosts authentication refused for %.100s: bad modes for %.200s",
++		    (st.st_uid != 0 && st.st_uid != pw->pw_uid)) {
++			logit("Rhosts authentication refused for %.100s: bad ownership for %.200s",
+ 			    pw->pw_name, buf);
+-			auth_debug_add("Bad file modes for %.200s", buf);
++			auth_debug_add("Bad file ownership for %.200s", buf);
+ 			continue;
+ 		}
+ 		/*
+diff --git a/misc.c b/misc.c
+index ae4d29b8..eb65a4e5 100644
+--- a/misc.c
++++ b/misc.c
+@@ -1782,9 +1782,8 @@ safe_path(const char *name, struct stat *stp, const char *pw_dir,
+ 		snprintf(err, errlen, "%s is not a regular file", buf);
+ 		return -1;
+ 	}
+-	if ((!platform_sys_dir_uid(stp->st_uid) && stp->st_uid != uid) ||
+-	    (stp->st_mode & 022) != 0) {
+-		snprintf(err, errlen, "bad ownership or modes for file %s",
++	if (!platform_sys_dir_uid(stp->st_uid) && stp->st_uid != uid) {
++		snprintf(err, errlen, "bad ownership for file %s",
+ 		    buf);
+ 		return -1;
+ 	}
+@@ -1798,10 +1797,9 @@ safe_path(const char *name, struct stat *stp, const char *pw_dir,
+ 		strlcpy(buf, cp, sizeof(buf));
+ 
+ 		if (stat(buf, &st) < 0 ||
+-		    (!platform_sys_dir_uid(st.st_uid) && st.st_uid != uid) ||
+-		    (st.st_mode & 022) != 0) {
++		    (!platform_sys_dir_uid(st.st_uid) && st.st_uid != uid)) {
+ 			snprintf(err, errlen,
+-			    "bad ownership or modes for directory %s", buf);
++			    "bad ownership for directory %s", buf);
+ 			return -1;
+ 		}
+ 
+diff --git a/readconf.c b/readconf.c
+index 67feffa5..4ad4ed6c 100644
+--- a/readconf.c
++++ b/readconf.c
+@@ -1764,8 +1764,7 @@ read_config_file_depth(const char *filename, struct passwd *pw,
+ 
+ 		if (fstat(fileno(f), &sb) == -1)
+ 			fatal("fstat %s: %s", filename, strerror(errno));
+-		if (((sb.st_uid != 0 && sb.st_uid != getuid()) ||
+-		    (sb.st_mode & 022) != 0))
++		if (sb.st_uid != 0 && sb.st_uid != getuid())
+ 			fatal("Bad owner or permissions on %s", filename);
+ 	}
+ 
+diff --git a/session.c b/session.c
+index f2cf5200..ce5a99d9 100644
+--- a/session.c
++++ b/session.c
+@@ -1355,7 +1355,7 @@ safely_chroot(const char *path, uid_t uid)
+ 		if (stat(component, &st) != 0)
+ 			fatal("%s: stat(\"%s\"): %s", __func__,
+ 			    component, strerror(errno));
+-		if (st.st_uid != 0 || (st.st_mode & 022) != 0)
++		if (st.st_uid != 0)
+ 			fatal("bad ownership or modes for chroot "
+ 			    "directory %s\"%s\"", 
+ 			    cp == NULL ? "" : "component ", component);
+diff --git a/sshd.c b/sshd.c
+index a738c3ab..fb60826e 100644
+--- a/sshd.c
++++ b/sshd.c
+@@ -1869,10 +1869,9 @@ main(int ac, char **av)
+ 
+ #ifdef HAVE_CYGWIN
+ 		if (check_ntsec(_PATH_PRIVSEP_CHROOT_DIR) &&
+-		    (st.st_uid != getuid () ||
+-		    (st.st_mode & (S_IWGRP|S_IWOTH)) != 0))
++		    st.st_uid != getuid ())
+ #else
+-		if (st.st_uid != 0 || (st.st_mode & (S_IWGRP|S_IWOTH)) != 0)
++		if (st.st_uid != 0)
+ #endif
+ 			fatal("%s must be owned by root and not group or "
+ 			    "world-writable.", _PATH_PRIVSEP_CHROOT_DIR);

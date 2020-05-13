@@ -1,0 +1,40 @@
+diff -Nuarp icu-ori/source/i18n/decimfmt.cpp icu/source/i18n/decimfmt.cpp
+--- icu-ori/source/i18n/decimfmt.cpp	2018-06-21 11:38:50.000000000 +0200
++++ icu/source/i18n/decimfmt.cpp	2018-09-27 17:42:35.617349869 +0200
+@@ -10,6 +10,7 @@
+ #define UNISTR_FROM_STRING_EXPLICIT
+ 
+ #include <cmath>
++#include <math.h>
+ #include <cstdlib>
+ #include <stdlib.h>
+ #include "unicode/errorcode.h"
+@@ -1333,7 +1334,7 @@ bool DecimalFormat::fastFormatDouble(dou
+         return false;
+     }
+     if (std::isnan(input)
+-            || std::trunc(input) != input
++            || trunc(input) != input
+             || input <= INT32_MIN
+             || input > INT32_MAX) {
+         return false;
+diff -Nuarp icu-ori/source/i18n/number_decimalquantity.cpp icu/source/i18n/number_decimalquantity.cpp
+--- icu-ori/source/i18n/number_decimalquantity.cpp	2018-06-21 11:38:50.000000000 +0200
++++ icu/source/i18n/number_decimalquantity.cpp	2018-09-27 07:54:03.009494878 +0200
+@@ -7,6 +7,7 @@
+ 
+ #include <cstdlib>
+ #include <cmath>
++#include <math.h>
+ #include <limits>
+ #include <stdlib.h>
+ 
+@@ -432,7 +433,7 @@ void DecimalQuantity::_setToDoubleFast(d
+         for (; i <= -22; i += 22) n /= 1e22;
+         n /= DOUBLE_MULTIPLIERS[-i];
+     }
+-    auto result = static_cast<int64_t>(std::round(n));
++    auto result = static_cast<int64_t>(round(n));
+     if (result != 0) {
+         _setToLong(result);
+         scale -= fracLength;

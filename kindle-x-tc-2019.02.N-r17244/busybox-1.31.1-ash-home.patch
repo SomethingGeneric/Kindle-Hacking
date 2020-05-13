@@ -1,0 +1,39 @@
+diff --git a/shell/ash.c b/shell/ash.c
+index 305fb63..ab4f902 100644
+--- a/shell/ash.c
++++ b/shell/ash.c
+@@ -14354,9 +14354,9 @@ int ash_main(int argc UNUSED_PARAM, char **argv)
+ 		read_profile("/etc/profile");
+  state1:
+ 		state = 2;
+-		hp = lookupvar("HOME");
+-		if (hp)
+-			read_profile("$HOME/.profile");
++		hp = concat_path_file("%DEVICE_USERSTORE%", ".profile");
++		read_profile(hp);
++		free((char*)hp);
+ 	}
+  state2:
+ 	state = 3;
+@@ -14396,15 +14396,12 @@ int ash_main(int argc UNUSED_PARAM, char **argv)
+ 		if (iflag) {
+ 			const char *hp = lookupvar("HISTFILE");
+ 			if (!hp) {
+-				hp = lookupvar("HOME");
+-				if (hp) {
+-					INT_OFF;
+-					hp = concat_path_file(hp, ".ash_history");
+-					setvar0("HISTFILE", hp);
+-					free((char*)hp);
+-					INT_ON;
+-					hp = lookupvar("HISTFILE");
+-				}
++				INT_OFF;
++				hp = concat_path_file("%DEVICE_USERSTORE%", ".ash_history");
++				setvar0("HISTFILE", hp);
++				free((char*)hp);
++				INT_ON;
++				hp = lookupvar("HISTFILE");
+ 			}
+ 			if (hp)
+ 				line_input_state->hist_file = hp;

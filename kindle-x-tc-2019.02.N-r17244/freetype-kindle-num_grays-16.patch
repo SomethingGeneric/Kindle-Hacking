@@ -1,0 +1,65 @@
+diff --git a/src/base/ftbitmap.c b/src/base/ftbitmap.c
+index 182b1cc..78ea978 100644
+--- a/src/base/ftbitmap.c
++++ b/src/base/ftbitmap.c
+@@ -567,7 +567,7 @@
+         FT_Int    i;
+ 
+ 
+-        target->num_grays = 256;
++        target->num_grays = 16;
+ 
+         for ( i = source->rows; i > 0; i-- )
+         {
+diff --git a/src/bdf/bdfdrivr.c b/src/bdf/bdfdrivr.c
+index 0ea0a5e..aa0fb26 100644
+--- a/src/bdf/bdfdrivr.c
++++ b/src/bdf/bdfdrivr.c
+@@ -707,7 +707,7 @@ THE SOFTWARE.
+       break;
+     case 8:
+       bitmap->pixel_mode = FT_PIXEL_MODE_GRAY;
+-      bitmap->num_grays  = 256;
++      bitmap->num_grays  = 16;
+       break;
+     }
+ 
+diff --git a/src/raster/ftrend1.c b/src/raster/ftrend1.c
+index aa7f6d5..2ffad0c 100644
+--- a/src/raster/ftrend1.c
++++ b/src/raster/ftrend1.c
+@@ -200,7 +200,7 @@
+       /* we pad to 32 bits, only for backwards compatibility with FT 1.x */
+       pitch              = FT_PAD_CEIL( width, 4 );
+       bitmap->pixel_mode = FT_PIXEL_MODE_GRAY;
+-      bitmap->num_grays  = 256;
++      bitmap->num_grays  = 16;
+     }
+     else
+     {
+diff --git a/src/sfnt/ttsbit.c b/src/sfnt/ttsbit.c
+index 8258f79..51730b3 100644
+--- a/src/sfnt/ttsbit.c
++++ b/src/sfnt/ttsbit.c
+@@ -442,7 +442,7 @@
+     case 8:
+       map->pixel_mode = FT_PIXEL_MODE_GRAY;
+       map->pitch      = map->width;
+-      map->num_grays  = 256;
++      map->num_grays  = 16;
+       break;
+ 
+     case 32:
+diff --git a/src/smooth/ftsmooth.c b/src/smooth/ftsmooth.c
+index 89088cd..85d77d1 100644
+--- a/src/smooth/ftsmooth.c
++++ b/src/smooth/ftsmooth.c
+@@ -245,7 +245,7 @@
+ #endif
+ 
+     bitmap->pixel_mode = FT_PIXEL_MODE_GRAY;
+-    bitmap->num_grays  = 256;
++    bitmap->num_grays  = 16;
+     bitmap->width      = width;
+     bitmap->rows       = height;
+     bitmap->pitch      = pitch;

@@ -1,0 +1,13 @@
+diff --git a/src/base/ftlcdfil.c b/src/base/ftlcdfil.c
+index 5ee7e0a..3e90030 100644
+--- a/src/base/ftlcdfil.c
++++ b/src/base/ftlcdfil.c
+@@ -306,7 +306,7 @@
+                            FT_LcdFilter  filter )
+   {
+     static const FT_Byte  default_filter[5] =
+-                            { 0x08, 0x4d, 0x56, 0x4d, 0x08 };
++                            { 0x1c, 0x38, 0x55, 0x38, 0x1c };
+     static const FT_Byte  light_filter[5] =
+                             { 0x00, 0x55, 0x56, 0x55, 0x00 };
+ 

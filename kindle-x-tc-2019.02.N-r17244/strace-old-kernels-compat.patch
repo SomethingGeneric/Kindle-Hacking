@@ -1,0 +1,24 @@
+diff --git a/configure.ac b/configure.ac
+index a7938e5c..cd1f758f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -324,13 +324,14 @@ AC_CHECK_TYPES([s390_compat_regs],,, [#include <asm/ptrace.h>])
+ AC_CHECK_TYPES(m4_normalize([
+ 	struct flock,
+ 	struct flock64,
+-	struct __kernel_flock,
+-	struct __kernel_flock64,
+ 	struct f_owner_ex,
++]),,, [#include <fcntl.h>])
++
++AC_CHECK_TYPES(m4_normalize([
++	struct __kernel_flock,
++	struct __kernel_flock64
+ 	struct __kernel_f_owner_ex
+-]),,,
+-[#include <sys/types.h>
+-#include <linux/fcntl.h>])
++]),,, [#include <linux/fcntl.h>])
+ 
+ AC_CHECK_TYPES(m4_normalize([
+ 	struct crypto_report_aead,

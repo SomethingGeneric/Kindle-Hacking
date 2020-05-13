@@ -1,0 +1,152 @@
+diff --git a/Makefile.am b/Makefile.am
+index 025af71c..429b694a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -33,6 +33,7 @@ strace_SOURCES =	\
+ 	count.c		\
+ 	desc.c		\
+ 	dirent.c	\
++	einkfb.c	\
+ 	execve.c	\
+ 	exit.c		\
+ 	fadvise.c	\
+diff --git a/defs.h b/defs.h
+index 8d654a59..445d5ffa 100644
+--- a/defs.h
++++ b/defs.h
+@@ -746,6 +746,7 @@ extern int sock_ioctl(struct tcb *, const unsigned int, long);
+ extern int term_ioctl(struct tcb *, const unsigned int, long);
+ extern int ubi_ioctl(struct tcb *, const unsigned int, long);
+ extern int v4l2_ioctl(struct tcb *, const unsigned int, long);
++extern int einkfb_ioctl(struct tcb *, const unsigned int, long);
+ 
+ extern int tv_nz(const struct timeval *);
+ extern int tv_cmp(const struct timeval *, const struct timeval *);
+diff --git a/einkfb.c b/einkfb.c
+new file mode 100644
+index 00000000..08e1b93b
+--- /dev/null
++++ b/einkfb.c
+@@ -0,0 +1,91 @@
++/*
++* Copyright (c) 2018 NiLuJe <ninuje@gmail.com>
++* Extended from an original implementation:
++* Copyright (c) 2014 Andrey Golovizin <ag@sologoc.com>
++* All rights reserved.
++*
++* Redistribution and use in source and binary forms, with or without
++* modification, are permitted provided that the following conditions
++* are met:
++* 1. Redistributions of source code must retain the above copyright
++*    notice, this list of conditions and the following disclaimer.
++* 2. Redistributions in binary form must reproduce the above copyright
++*    notice, this list of conditions and the following disclaimer in the
++*    documentation and/or other materials provided with the distribution.
++* 3. The name of the author may not be used to endorse or promote products
++*    derived from this software without specific prior written permission.
++*
++* THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
++* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++* OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
++* IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
++* INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
++* NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++* DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++* THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
++* THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++
++#include "defs.h"
++#include <linux/ioctl.h>
++
++typedef uint8_t __u8;
++typedef uint8_t u8;
++
++#include <linux/einkfb.h>
++
++//#include "xlat/einkfb_fx_type.h"
++
++int einkfb_ioctl(struct tcb *tcp, const unsigned int code, long arg)
++{
++	struct update_area_t area;
++	fx_type fx_type_data;
++
++	switch (code) {
++		case FBIO_EINK_UPDATE_DISPLAY_AREA:
++			if (!verbose(tcp) || umove(tcp, arg, &area) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				tprintf("x1=%i", area.x1);
++				tprintf(", y1=%i", area.y1);
++				tprintf(", x2=%i", area.x2);
++				tprintf(", y2=%i", area.y2);
++				tprintf(", which_fx=%i", area.which_fx);
++				/*
++				tprints(", which_fx=");
++				printflags(einkfb_fx_type, area.which_fx, "fx_???");
++				*/
++				tprintf(", buffer=%#" PRIx8, area.buffer);
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++		case FBIO_EINK_UPDATE_DISPLAY:
++			if (!verbose(tcp) || umove(tcp, arg, &fx_type_data) < 0)
++				return 0;
++
++			if (entering(tcp))
++			{
++				tprints(", {");
++				tprintf("%i", fx_type_data);
++				//printflags(einkfb_fx_type, fx_type_data, "fx_???");
++			}
++			else
++			{
++				tprints("}");
++			}
++			return 1;
++
++
++		default:
++			return 0;
++	}
++}
++
+diff --git a/ioctl.c b/ioctl.c
+index 65786647..fc1d1c26 100644
+--- a/ioctl.c
++++ b/ioctl.c
+@@ -244,6 +244,8 @@ ioctl_decode(struct tcb *tcp, unsigned int code, long arg)
+ 	case 0x22:
+ 		return scsi_ioctl(tcp, code, arg);
+ #endif
++	case 'F':
++		return einkfb_ioctl(tcp, code, arg);
+ 	case 'L':
+ 		return loop_ioctl(tcp, code, arg);
+ 	case 'M':
+diff --git a/xlat/einkfb_fx_type.in b/xlat/einkfb_fx_type.in
+new file mode 100644
+index 00000000..1e9c7327
+--- /dev/null
++++ b/xlat/einkfb_fx_type.in
+@@ -0,0 +1,12 @@
++fx_mask
++fx_buf_is_mask
++fx_none
++fx_flash
++fx_invert
++fx_update_partial
++fx_update_full
++fx_update_fast
++fx_update_slow
++fx_buffer_load
++fx_buffer_display_partial
++fx_buffer_display_full

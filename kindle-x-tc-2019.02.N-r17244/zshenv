@@ -1,0 +1,39 @@
+##
+#
+#	NiLuJe's .zshenv - eInk edition
+#
+#	kate: syntax Zsh
+#
+#	$Id: zshenv 17201 2020-05-02 18:15:53Z NiLuJe $
+#
+##
+
+# Kindle or Kobo?
+local eink_userstore
+if [[ -e "/proc/usid" ]] ; then
+	eink_userstore="/mnt/us"
+
+	# Non en-US locales go wonky w/ zsh-syntax-highlighting (Invalid collation character)...
+	export LANG="en_US.utf8"
+	export LC_ALL="en_US.utf8"
+else
+	eink_userstore="/mnt/onboard/.niluje"
+
+	# HOME defaults to / on Kobo, and the rootfs happens to be RW...
+	# Point it to /tmp instead (as it's a tiny tmpfs) to avoid FUBAR'ing the rootfs...
+	export HOME="/tmp/root"
+	[[ ! -d "${HOME}" ]] && mkdir -p "${HOME}"
+	cd "${HOME}"
+
+	# Make sure our custom busybox will get picked up above Kobo's...
+	export PATH="/usr/local/niluje/usbnet/sbin:/usr/local/niluje/usbnet/usr/sbin:/usr/local/niluje/usbnet/bin:/usr/local/niluje/usbnet/usr/bin:${PATH}"
+
+	# If you've bothered to fix locales, use a sane one
+	if [[ -f /usr/lib/locale/locale-archive ]] ; then
+		export LANG="en_US.UTF-8"
+		export LC_ALL="en_US.UTF-8"
+	fi
+fi
+
+# Make sure we don't store anything in HOME, because it's either broken or a tmpfs...
+export ZDOTDIR="${eink_userstore}/usbnet/etc/zsh"

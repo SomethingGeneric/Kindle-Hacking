@@ -1,0 +1,746 @@
+diff --git a/common-algo.c b/common-algo.c
+index 2f896ab..4141f4c 100644
+--- a/common-algo.c
++++ b/common-algo.c
+@@ -255,8 +255,6 @@ static const struct dropbear_kex kex_dh_group14_sha256 = {DROPBEAR_KEX_NORMAL_DH
+ static const struct dropbear_kex kex_dh_group16_sha512 = {DROPBEAR_KEX_NORMAL_DH, dh_p_16, DH_P_16_LEN, NULL, &sha512_desc };
+ #endif
+ 
+-/* These can't be const since dropbear_ecc_fill_dp() fills out
+- ecc_curve at runtime */
+ #if DROPBEAR_ECDH
+ #if DROPBEAR_ECC_256
+ static const struct dropbear_kex kex_ecdh_nistp256 = {DROPBEAR_KEX_ECDH, NULL, 0, &ecc_curve_nistp256, &sha256_desc };
+diff --git a/common-kex.c b/common-kex.c
+index d4933dd..31f73ec 100644
+--- a/common-kex.c
++++ b/common-kex.c
+@@ -650,8 +650,12 @@ void kexdh_comb_key(struct kex_dh_param *param, mp_int *dh_pub_them,
+ #if DROPBEAR_ECDH
+ struct kex_ecdh_param *gen_kexecdh_param() {
+ 	struct kex_ecdh_param *param = m_malloc(sizeof(*param));
++	const ltc_ecc_curve* cu = NULL;
++	if (ecc_find_curve(ses.newkeys->algo_kex->ecc_curve->name, &cu) != CRYPT_OK) {
++		dropbear_exit("ECC error");
++	}
+ 	if (ecc_make_key_ex(NULL, dropbear_ltc_prng, 
+-		&param->key, ses.newkeys->algo_kex->ecc_curve->dp) != CRYPT_OK) {
++		&param->key, cu) != CRYPT_OK) {
+ 		dropbear_exit("ECC error");
+ 	}
+ 	return param;
+diff --git a/configure.ac b/configure.ac
+index c0bb8a3..41dcdf2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -515,14 +515,20 @@ AC_ARG_ENABLE(bundled-libtom,
+ 			BUNDLED_LIBTOM=0
+ 			AC_CHECK_LIB(tommath, mp_exptmod, LIBTOM_LIBS="-ltommath $LIBTOM_LIBS",
+ 				[AC_MSG_ERROR([Missing system libtommath and --disable-bundled-libtom was specified])] )
++			AC_CHECK_LIB(tommath, mp_sqrtmod_prime, LIBTOM_LIBS="-ltommath $LIBTOM_LIBS",
++				[AC_MSG_ERROR([System libtommath is too old (1.0+ required)])] )
+ 			AC_CHECK_LIB(tomcrypt, register_cipher, LIBTOM_LIBS="-ltomcrypt $LIBTOM_LIBS",
+ 				[AC_MSG_ERROR([Missing system libtomcrypt and --disable-bundled-libtom was specified])] )
++			AC_CHECK_LIB(tomcrypt, ecc_find_curve, LIBTOM_LIBS="-ltomcrypt $LIBTOM_LIBS",
++				[AC_MSG_ERROR([System libtomcrypt is too old (1.19+ required)])] )
+ 		fi
+ 	],
+ 	[
+ 		BUNDLED_LIBTOM=0
+ 		AC_CHECK_LIB(tommath, mp_exptmod, LIBTOM_LIBS="-ltommath $LIBTOM_LIBS", BUNDLED_LIBTOM=1)
++		AC_CHECK_LIB(tommath, mp_sqrtmod_prime, LIBTOM_LIBS="-ltommath $LIBTOM_LIBS", BUNDLED_LIBTOM=1)
+ 		AC_CHECK_LIB(tomcrypt, register_cipher, LIBTOM_LIBS="-ltomcrypt $LIBTOM_LIBS", BUNDLED_LIBTOM=1)
++		AC_CHECK_LIB(tomcrypt, ecc_find_curve, LIBTOM_LIBS="-ltomcrypt $LIBTOM_LIBS", BUNDLED_LIBTOM=1)
+ 	]
+ )
+ 
+diff --git a/crypto_desc.c b/crypto_desc.c
+index 0f946fc..f3e07c4 100644
+--- a/crypto_desc.c
++++ b/crypto_desc.c
+@@ -69,7 +69,6 @@ void crypto_init() {
+ 
+ #if DROPBEAR_ECC
+ 	ltc_mp = ltm_desc;
+-	dropbear_ecc_fill_dp();
+ #endif
+ }
+ 
+diff --git a/ecc.c b/ecc.c
+index c4881d9..7f6f3ef 100644
+--- a/ecc.c
++++ b/ecc.c
+@@ -5,29 +5,25 @@
+ 
+ #if DROPBEAR_ECC
+ 
+-/* .dp members are filled out by dropbear_ecc_fill_dp() at startup */
+ #if DROPBEAR_ECC_256
+ struct dropbear_ecc_curve ecc_curve_nistp256 = {
+-	32,		/* .ltc_size	*/
+-	NULL,		/* .dp		*/
+ 	&sha256_desc,	/* .hash_desc	*/
+-	"nistp256"	/* .name	*/
++	"nistp256",	/* .name	*/
++	"1.2.840.10045.3.1.7"	/* .oid	*/
+ };
+ #endif
+ #if DROPBEAR_ECC_384
+ struct dropbear_ecc_curve ecc_curve_nistp384 = {
+-	48,		/* .ltc_size	*/
+-	NULL,		/* .dp		*/
+ 	&sha384_desc,	/* .hash_desc	*/
+-	"nistp384"	/* .name	*/
++	"nistp384",	/* .name	*/
++	"1.3.132.0.34"	/* .oid		*/
+ };
+ #endif
+ #if DROPBEAR_ECC_521
+ struct dropbear_ecc_curve ecc_curve_nistp521 = {
+-	66,		/* .ltc_size	*/
+-	NULL,		/* .dp		*/
+ 	&sha512_desc,	/* .hash_desc	*/
+-	"nistp521"	/* .name	*/
++	"nistp521",	/* .name	*/
++	"1.3.132.0.35"	/* .oid		*/
+ };
+ #endif
+ 
+@@ -44,99 +40,26 @@ struct dropbear_ecc_curve *dropbear_ecc_curves[] = {
+ 	NULL
+ };
+ 
+-void dropbear_ecc_fill_dp() {
+-	struct dropbear_ecc_curve **curve;
+-	/* libtomcrypt guarantees they're ordered by size */
+-	const ltc_ecc_set_type *dp = ltc_ecc_sets;
+-	for (curve = dropbear_ecc_curves; *curve; curve++) {
+-		for (;dp->size > 0; dp++) {
+-			if (dp->size == (*curve)->ltc_size) {
+-				(*curve)->dp = dp;
++struct dropbear_ecc_curve* curve_for_key(const ecc_key *key) {
++	struct dropbear_ecc_curve **curve = NULL;
++	char buf[64] = { 0 };
++	unsigned long buf_len = sizeof(buf);
++	if (ecc_get_oid_str(buf, &buf_len, key) == CRYPT_OK) {
++		for (curve = dropbear_ecc_curves; *curve; curve++) {
++			if (strcmp((*curve)->oid, buf) == 0) {
+ 				break;
+ 			}
+ 		}
+-		if (!(*curve)->dp) {
+-			dropbear_exit("Missing ECC params %s", (*curve)->name);
+-		}
+-	}
+-}
+-
+-struct dropbear_ecc_curve* curve_for_dp(const ltc_ecc_set_type *dp) {
+-	struct dropbear_ecc_curve **curve = NULL;
+-	for (curve = dropbear_ecc_curves; *curve; curve++) {
+-		if ((*curve)->dp == dp) {
+-			break;
+-		}
+ 	}
+-	assert(*curve);
+ 	return *curve;
+ }
+ 
+-ecc_key * new_ecc_key(void) {
+-	ecc_key *key = m_malloc(sizeof(*key));
+-	m_mp_alloc_init_multi((mp_int**)&key->pubkey.x, (mp_int**)&key->pubkey.y, 
+-		(mp_int**)&key->pubkey.z, (mp_int**)&key->k, NULL);
+-	return key;
+-}
+-
+-/* Copied from libtomcrypt ecc_import.c (version there is static), modified
+-   for different mp_int pointer without LTC_SOURCE */
+-static int ecc_is_point(const ecc_key *key)
+-{
+-	mp_int *prime, *b, *t1, *t2;
+-	int err;
+-	
+-	m_mp_alloc_init_multi(&prime, &b, &t1, &t2, NULL);
+-	
+-   /* load prime and b */
+-	if ((err = mp_read_radix(prime, key->dp->prime, 16)) != CRYPT_OK)                          { goto error; }
+-	if ((err = mp_read_radix(b, key->dp->B, 16)) != CRYPT_OK)                                  { goto error; }
+-	
+-   /* compute y^2 */
+-	if ((err = mp_sqr(key->pubkey.y, t1)) != CRYPT_OK)                                         { goto error; }
+-	
+-   /* compute x^3 */
+-	if ((err = mp_sqr(key->pubkey.x, t2)) != CRYPT_OK)                                         { goto error; }
+-	if ((err = mp_mod(t2, prime, t2)) != CRYPT_OK)                                             { goto error; }
+-	if ((err = mp_mul(key->pubkey.x, t2, t2)) != CRYPT_OK)                                     { goto error; }
+-	
+-   /* compute y^2 - x^3 */
+-	if ((err = mp_sub(t1, t2, t1)) != CRYPT_OK)                                                { goto error; }
+-	
+-   /* compute y^2 - x^3 + 3x */
+-	if ((err = mp_add(t1, key->pubkey.x, t1)) != CRYPT_OK)                                     { goto error; }
+-	if ((err = mp_add(t1, key->pubkey.x, t1)) != CRYPT_OK)                                     { goto error; }
+-	if ((err = mp_add(t1, key->pubkey.x, t1)) != CRYPT_OK)                                     { goto error; }
+-	if ((err = mp_mod(t1, prime, t1)) != CRYPT_OK)                                             { goto error; }
+-	while (mp_cmp_d(t1, 0) == LTC_MP_LT) {
+-		if ((err = mp_add(t1, prime, t1)) != CRYPT_OK)                                          { goto error; }
+-	}
+-	while (mp_cmp(t1, prime) != LTC_MP_LT) {
+-		if ((err = mp_sub(t1, prime, t1)) != CRYPT_OK)                                          { goto error; }
+-	}
+-	
+-   /* compare to b */
+-	if (mp_cmp(t1, b) != LTC_MP_EQ) {
+-		err = CRYPT_INVALID_PACKET;
+-	} else {
+-		err = CRYPT_OK;
+-	}
+-	
+-	error:
+-	mp_clear_multi(prime, b, t1, t2, NULL);
+-	m_free(prime);
+-	m_free(b);
+-	m_free(t1);
+-	m_free(t2);
+-	return err;
+-}
+-
+ /* For the "ephemeral public key octet string" in ECDH (rfc5656 section 4) */
+ void buf_put_ecc_raw_pubkey_string(buffer *buf, ecc_key *key) {
+-	unsigned long len = key->dp->size*2 + 1;
++	unsigned long len = ecc_get_size(key) * 2 + 1;
+ 	int err;
+ 	buf_putint(buf, len);
+-	err = ecc_ansi_x963_export(key, buf_getwriteptr(buf, len), &len);
++	err = ecc_get_key(buf_getwriteptr(buf, len), &len, PK_PUBLIC, key);
+ 	if (err != CRYPT_OK) {
+ 		dropbear_exit("ECC error");
+ 	}
+@@ -147,53 +70,12 @@ void buf_put_ecc_raw_pubkey_string(buffer *buf, ecc_key *key) {
+ ecc_key * buf_get_ecc_raw_pubkey(buffer *buf, const struct dropbear_ecc_curve *curve) {
+ 	ecc_key *key = NULL;
+ 	int ret = DROPBEAR_FAILURE;
+-	const unsigned int size = curve->dp->size;
+-	unsigned char first;
+-
+-	TRACE(("enter buf_get_ecc_raw_pubkey"))
+-
+-	buf_setpos(buf, 0);
+-	first = buf_getbyte(buf);
+-	if (first == 2 || first == 3) {
+-		dropbear_log(LOG_WARNING, "Dropbear doesn't support ECC point compression");
+-		return NULL;
+-	}
+-	if (first != 4 || buf->len != 1+2*size) {
+-		TRACE(("leave, wrong size"))
+-		return NULL;
+-	}
+-
+-	key = new_ecc_key();
+-	key->dp = curve->dp;
+-
+-	if (mp_read_unsigned_bin(key->pubkey.x, buf_getptr(buf, size), size) != MP_OKAY) {
+-		TRACE(("failed to read x"))
+-		goto out;
+-	}
+-	buf_incrpos(buf, size);
+-
+-	if (mp_read_unsigned_bin(key->pubkey.y, buf_getptr(buf, size), size) != MP_OKAY) {
+-		TRACE(("failed to read y"))
+-		goto out;
+-	}
+-	buf_incrpos(buf, size);
+-
+-	mp_set(key->pubkey.z, 1);
++	const ltc_ecc_curve* cu = NULL;
+ 
+-	if (ecc_is_point(key) != CRYPT_OK) {
+-		TRACE(("failed, not a point"))
+-		goto out;
+-	}
+-
+-   /* SEC1 3.2.3.1 Check that Q != 0 */
+-	if (mp_cmp_d(key->pubkey.x, 0) == LTC_MP_EQ) {
+-		TRACE(("failed, x == 0"))
+-		goto out;
+-	}
+-	if (mp_cmp_d(key->pubkey.y, 0) == LTC_MP_EQ) {
+-		TRACE(("failed, y == 0"))
+-		goto out;
+-	}
++	key = m_malloc(sizeof(*key));
++	if (ecc_find_curve(curve->oid, &cu) != CRYPT_OK) goto out;
++	if (ecc_set_curve(cu, key) != CRYPT_OK) goto out;
++	if (ecc_set_key(buf->data, buf->len, PK_PUBLIC, key) != CRYPT_OK) goto out;
+ 
+ 	ret = DROPBEAR_SUCCESS;
+ 
+@@ -210,49 +92,24 @@ ecc_key * buf_get_ecc_raw_pubkey(buffer *buf, const struct dropbear_ecc_curve *c
+ 
+ }
+ 
+-/* a modified version of libtomcrypt's "ecc_shared_secret" to output
++/* a wrapped version of libtomcrypt's "ecc_shared_secret" to output
+    a mp_int instead. */
+ mp_int * dropbear_ecc_shared_secret(ecc_key *public_key, const ecc_key *private_key)
+ {
+-	ecc_point *result = NULL;
+-	mp_int *prime = NULL, *shared_secret = NULL;
++	mp_int *shared_secret = NULL;
++	unsigned char shared_secret_buf[64];
++	unsigned long shared_secret_len = sizeof(shared_secret_buf);
++	shared_secret = m_malloc(sizeof(*shared_secret));
+ 	int err = DROPBEAR_FAILURE;
+ 
+-   /* type valid? */
+-	if (private_key->type != PK_PRIVATE) {
+-		goto out;
+-	}
+-
+-	if (private_key->dp != public_key->dp) {
+-		goto out;
+-	}
+-
+-   /* make new point */
+-	result = ltc_ecc_new_point();
+-	if (result == NULL) {
+-		goto out;
+-	}
+-
+-	prime = m_malloc(sizeof(*prime));
+-	m_mp_init(prime);
+-
+-	if (mp_read_radix(prime, (char *)private_key->dp->prime, 16) != CRYPT_OK) { 
+-		goto out;
+-	}
+-	if (ltc_mp.ecc_ptmul(private_key->k, &public_key->pubkey, result, prime, 1) != CRYPT_OK) { 
++	m_mp_init(shared_secret);
++	if (ecc_shared_secret(private_key, public_key, shared_secret_buf, &shared_secret_len) != CRYPT_OK) {
+ 		goto out;
+ 	}
+-
+-	shared_secret = m_malloc(sizeof(*shared_secret));
+-	m_mp_init(shared_secret);
+-	if (mp_copy(result->x, shared_secret) != CRYPT_OK) {
++	if (mp_read_unsigned_bin(shared_secret, shared_secret_buf, shared_secret_len) != MP_OKAY) {
+ 		goto out;
+ 	}
+ 
+-	mp_clear(prime);
+-	m_free(prime);
+-	ltc_ecc_del_point(result);
+-
+ 	err = DROPBEAR_SUCCESS;
+ 	out:
+ 	if (err == DROPBEAR_FAILURE) {
+diff --git a/ecc.h b/ecc.h
+index f4508f8..efa5ee9 100644
+--- a/ecc.h
++++ b/ecc.h
+@@ -8,10 +8,9 @@
+ #if DROPBEAR_ECC
+ 
+ struct dropbear_ecc_curve {
+-	int ltc_size; /* to match the byte sizes in ltc_ecc_sets[] */
+-	const ltc_ecc_set_type *dp; /* curve domain parameters */
+ 	const struct ltc_hash_descriptor *hash_desc;
+ 	const char *name;
++	const char *oid;
+ };
+ 
+ extern struct dropbear_ecc_curve ecc_curve_nistp256;
+@@ -19,11 +18,8 @@ extern struct dropbear_ecc_curve ecc_curve_nistp384;
+ extern struct dropbear_ecc_curve ecc_curve_nistp521;
+ extern struct dropbear_ecc_curve *dropbear_ecc_curves[];
+ 
+-void dropbear_ecc_fill_dp(void);
+-struct dropbear_ecc_curve* curve_for_dp(const ltc_ecc_set_type *dp);
++struct dropbear_ecc_curve* curve_for_key(const ecc_key *key);
+ 
+-/* "pubkey" refers to a point, but LTC uses ecc_key structure for both public
+-   and private keys */
+ void buf_put_ecc_raw_pubkey_string(buffer *buf, ecc_key *key);
+ ecc_key * buf_get_ecc_raw_pubkey(buffer *buf, const struct dropbear_ecc_curve *curve);
+ int buf_get_ecc_privkey_string(buffer *buf, ecc_key *key);
+diff --git a/ecdsa.c b/ecdsa.c
+index 56e5355..7c218e9 100644
+--- a/ecdsa.c
++++ b/ecdsa.c
+@@ -4,6 +4,7 @@
+ #include "ecc.h"
+ #include "ecdsa.h"
+ #include "signkey.h"
++#include "bignum.h"
+ 
+ #if DROPBEAR_ECDSA
+ 
+@@ -15,18 +16,19 @@ int signkey_is_ecdsa(enum signkey_type type)
+ }
+ 
+ enum signkey_type ecdsa_signkey_type(const ecc_key * key) {
++	struct dropbear_ecc_curve* curve = curve_for_key(key);
+ #if DROPBEAR_ECC_256
+-	if (key->dp == ecc_curve_nistp256.dp) {
++	if (curve == &ecc_curve_nistp256) {
+ 		return DROPBEAR_SIGNKEY_ECDSA_NISTP256;
+ 	}
+ #endif
+ #if DROPBEAR_ECC_384
+-	if (key->dp == ecc_curve_nistp384.dp) {
++	if (curve == &ecc_curve_nistp384) {
+ 		return DROPBEAR_SIGNKEY_ECDSA_NISTP384;
+ 	}
+ #endif
+ #if DROPBEAR_ECC_521
+-	if (key->dp == ecc_curve_nistp521.dp) {
++	if (curve == &ecc_curve_nistp521) {
+ 		return DROPBEAR_SIGNKEY_ECDSA_NISTP521;
+ 	}
+ #endif
+@@ -34,22 +36,22 @@ enum signkey_type ecdsa_signkey_type(const ecc_key * key) {
+ }
+ 
+ ecc_key *gen_ecdsa_priv_key(unsigned int bit_size) {
+-	const ltc_ecc_set_type *dp = NULL; /* curve domain parameters */
++	const ltc_ecc_curve *dp = NULL;
+ 	ecc_key *new_key = NULL;
+ 	switch (bit_size) {
+ #if DROPBEAR_ECC_256
+ 		case 256:
+-			dp = ecc_curve_nistp256.dp;
++			ecc_find_curve("nistp256", &dp);
+ 			break;
+ #endif
+ #if DROPBEAR_ECC_384
+ 		case 384:
+-			dp = ecc_curve_nistp384.dp;
++			ecc_find_curve("nistp384", &dp);
+ 			break;
+ #endif
+ #if DROPBEAR_ECC_521
+ 		case 521:
+-			dp = ecc_curve_nistp521.dp;
++			ecc_find_curve("nistp521", &dp);
+ 			break;
+ #endif
+ 	}
+@@ -94,7 +96,6 @@ ecc_key *buf_get_ecdsa_pub_key(buffer* buf) {
+ 		TRACE(("mismatching identifiers"))
+ 		goto out;
+ 	}
+-
+ 	for (curve = dropbear_ecc_curves; *curve; curve++) {
+ 		if (memcmp(identifier, (char*)(*curve)->name, strlen((char*)(*curve)->name)) == 0) {
+ 			break;
+@@ -116,7 +117,7 @@ out:
+ 		buf_free(q_buf);
+ 		q_buf = NULL;
+ 	}
+-	TRACE(("leave buf_get_ecdsa_pub_key"))	
++	TRACE(("leave buf_get_ecdsa_pub_key"))
+ 	return new_key;
+ }
+ 
+@@ -138,10 +139,10 @@ ecc_key *buf_get_ecdsa_priv_key(buffer *buf) {
+ }
+ 
+ void buf_put_ecdsa_pub_key(buffer *buf, ecc_key *key) {
+-	struct dropbear_ecc_curve *curve = NULL;
++	struct dropbear_ecc_curve *curve = curve_for_key(key);
+ 	char key_ident[30];
+ 
+-	curve = curve_for_dp(key->dp);
++	if (curve == NULL) dropbear_exit("ECC error");
+ 	snprintf(key_ident, sizeof(key_ident), "ecdsa-sha2-%s", curve->name);
+ 	buf_putstring(buf, key_ident, strlen(key_ident));
+ 	buf_putstring(buf, curve->name, strlen(curve->name));
+@@ -154,72 +155,30 @@ void buf_put_ecdsa_priv_key(buffer *buf, ecc_key *key) {
+ }
+ 
+ void buf_put_ecdsa_sign(buffer *buf, const ecc_key *key, const buffer *data_buf) {
+-	/* Based on libtomcrypt's ecc_sign_hash but without the asn1 */
+-	int err = DROPBEAR_FAILURE;
+-	struct dropbear_ecc_curve *curve = NULL;
++	int err = DROPBEAR_FAILURE, rv;
+ 	hash_state hs;
+ 	unsigned char hash[64];
+-	void *e = NULL, *p = NULL, *s = NULL, *r;
++	mp_int *r = NULL, *s = NULL;
++	struct dropbear_ecc_curve *curve = curve_for_key(key);
++	unsigned char rawsig[200];
++	unsigned long rawsig_len = sizeof(rawsig);
+ 	char key_ident[30];
+ 	buffer *sigbuf = NULL;
+ 
+-	TRACE(("buf_put_ecdsa_sign"))
+-	curve = curve_for_dp(key->dp);
+-
+-	if (ltc_init_multi(&r, &s, &p, &e, NULL) != CRYPT_OK) { 
+-		goto out;
+-	}
+-
++	if (curve == NULL) goto out;
+ 	curve->hash_desc->init(&hs);
+ 	curve->hash_desc->process(&hs, data_buf->data, data_buf->len);
+ 	curve->hash_desc->done(&hs, hash);
+ 
+-	if (ltc_mp.unsigned_read(e, hash, curve->hash_desc->hashsize) != CRYPT_OK) {
+-		goto out;
+-	}
++	rv = ecc_sign_hash_rfc7518(hash, curve->hash_desc->hashsize,
++					rawsig, &rawsig_len,
++					NULL, dropbear_ltc_prng, key);
++	if (rv != CRYPT_OK) goto out;
+ 
+-	if (ltc_mp.read_radix(p, (char *)key->dp->order, 16) != CRYPT_OK) { 
+-		goto out; 
+-	}
++	m_mp_alloc_init_multi(&r, &s, NULL);
+ 
+-	for (;;) {
+-		ecc_key R_key; /* ephemeral key */
+-		if (ecc_make_key_ex(NULL, dropbear_ltc_prng, &R_key, key->dp) != CRYPT_OK) {
+-			goto out;
+-		}
+-		if (ltc_mp.mpdiv(R_key.pubkey.x, p, NULL, r) != CRYPT_OK) {
+-			goto out;
+-		}
+-		if (ltc_mp.compare_d(r, 0) == LTC_MP_EQ) {
+-			/* try again */
+-			ecc_free(&R_key);
+-			continue;
+-		}
+-		/* k = 1/k */
+-		if (ltc_mp.invmod(R_key.k, p, R_key.k) != CRYPT_OK) {
+-			goto out;
+-		}
+-		/* s = xr */
+-		if (ltc_mp.mulmod(key->k, r, p, s) != CRYPT_OK) {
+-			goto out;
+-		}
+-		/* s = e +  xr */
+-		if (ltc_mp.add(e, s, s) != CRYPT_OK) {
+-			goto out;
+-		}
+-		if (ltc_mp.mpdiv(s, p, NULL, s) != CRYPT_OK) {
+-			goto out;
+-		}
+-		/* s = (e + xr)/k */
+-		if (ltc_mp.mulmod(s, R_key.k, p, s) != CRYPT_OK) {
+-			goto out;
+-		}
+-		ecc_free(&R_key);
+-
+-		if (ltc_mp.compare_d(s, 0) != LTC_MP_EQ) {
+-			break;
+-		}
+-	}
++	if (mp_read_unsigned_bin(r, rawsig, rawsig_len / 2) != CRYPT_OK) goto out;
++	if (mp_read_unsigned_bin(s, rawsig + rawsig_len / 2, rawsig_len / 2) != CRYPT_OK) goto out;
+ 
+ 	snprintf(key_ident, sizeof(key_ident), "ecdsa-sha2-%s", curve->name);
+ 	buf_putstring(buf, key_ident, strlen(key_ident));
+@@ -232,10 +191,7 @@ void buf_put_ecdsa_sign(buffer *buf, const ecc_key *key, const buffer *data_buf)
+ 	err = DROPBEAR_SUCCESS;
+ 
+ out:
+-	if (r && s && p && e) {
+-		ltc_deinit_multi(r, s, p, e, NULL);
+-	}
+-
++	m_mp_free_multi(&r, &s, NULL);
+ 	if (sigbuf) {
+ 		buf_free(sigbuf);
+ 	}
+@@ -270,148 +226,38 @@ out:
+ 	return ret;
+ }
+ 
+-
+ int buf_ecdsa_verify(buffer *buf, const ecc_key *key, const buffer *data_buf) {
+-	/* Based on libtomcrypt's ecc_verify_hash but without the asn1 */
+-	int ret = DROPBEAR_FAILURE;
+ 	hash_state hs;
+-	struct dropbear_ecc_curve *curve = NULL;
+-	unsigned char hash[64];
+-	ecc_point *mG = NULL, *mQ = NULL;
+-	void *r = NULL, *s = NULL, *v = NULL, *w = NULL, *u1 = NULL, *u2 = NULL, 
+-		*e = NULL, *p = NULL, *m = NULL;
+-	void *mp = NULL;
+-
+-	/* verify 
+-	 *
+-	 * w  = s^-1 mod n
+-	 * u1 = xw 
+-	 * u2 = rw
+-	 * X = u1*G + u2*Q
+-	 * v = X_x1 mod n
+-	 * accept if v == r
+-	 */
+-
+-	TRACE(("buf_ecdsa_verify"))
+-	curve = curve_for_dp(key->dp);
+-
+-	mG = ltc_ecc_new_point();
+-	mQ = ltc_ecc_new_point();
+-	if (ltc_init_multi(&r, &s, &v, &w, &u1, &u2, &p, &e, &m, NULL) != CRYPT_OK
+-		|| !mG
+-		|| !mQ) {
+-		dropbear_exit("ECC error");
+-	}
++	unsigned char hash[64], rawsig[200] = { 0 };
++	unsigned long sig_half, i;
++	int ret = DROPBEAR_FAILURE, err, stat = 0;
++	struct dropbear_ecc_curve *curve = curve_for_key(key);
++	mp_int *r = NULL, *s = NULL;
+ 
++	m_mp_alloc_init_multi(&r, &s, NULL);
+ 	if (buf_get_ecdsa_verify_params(buf, r, s) != DROPBEAR_SUCCESS) {
+ 		goto out;
+ 	}
+ 
++	if (curve == NULL) goto out;
+ 	curve->hash_desc->init(&hs);
+ 	curve->hash_desc->process(&hs, data_buf->data, data_buf->len);
+ 	curve->hash_desc->done(&hs, hash);
+ 
+-	if (ltc_mp.unsigned_read(e, hash, curve->hash_desc->hashsize) != CRYPT_OK) {
+-		goto out;
+-	}
+-
+-   /* get the order */
+-	if (ltc_mp.read_radix(p, (char *)key->dp->order, 16) != CRYPT_OK) { 
+-		goto out; 
+-	}
+-
+-   /* get the modulus */
+-	if (ltc_mp.read_radix(m, (char *)key->dp->prime, 16) != CRYPT_OK) { 
+-		goto out; 
+-	}
+-
+-   /* check for zero */
+-	if (ltc_mp.compare_d(r, 0) == LTC_MP_EQ 
+-		|| ltc_mp.compare_d(s, 0) == LTC_MP_EQ 
+-		|| ltc_mp.compare(r, p) != LTC_MP_LT 
+-		|| ltc_mp.compare(s, p) != LTC_MP_LT) {
+-		goto out;
+-	}
+-
+-   /*  w  = s^-1 mod n */
+-	if (ltc_mp.invmod(s, p, w) != CRYPT_OK) { 
+-		goto out; 
+-	}
+-
+-   /* u1 = ew */
+-	if (ltc_mp.mulmod(e, w, p, u1) != CRYPT_OK) { 
+-		goto out; 
+-	}
+-
+-   /* u2 = rw */
+-	if (ltc_mp.mulmod(r, w, p, u2) != CRYPT_OK) { 
+-		goto out; 
+-	}
+-
+-   /* find mG and mQ */
+-	if (ltc_mp.read_radix(mG->x, (char *)key->dp->Gx, 16) != CRYPT_OK) { 
+-		goto out; 
+-	}
+-	if (ltc_mp.read_radix(mG->y, (char *)key->dp->Gy, 16) != CRYPT_OK) { 
+-		goto out; 
+-	}
+-	if (ltc_mp.set_int(mG->z, 1) != CRYPT_OK) { 
+-		goto out; 
+-	}
+-
+-	if (ltc_mp.copy(key->pubkey.x, mQ->x) != CRYPT_OK
+-		|| ltc_mp.copy(key->pubkey.y, mQ->y) != CRYPT_OK
+-		|| ltc_mp.copy(key->pubkey.z, mQ->z) != CRYPT_OK) { 
+-		goto out; 
+-	}
+-
+-   /* compute u1*mG + u2*mQ = mG */
+-	if (ltc_mp.ecc_mul2add == NULL) {
+-		if (ltc_mp.ecc_ptmul(u1, mG, mG, m, 0) != CRYPT_OK) { 
+-			goto out; 
+-		}
+-		if (ltc_mp.ecc_ptmul(u2, mQ, mQ, m, 0) != CRYPT_OK) {
+-			goto out; 
+-		}
+-
+-		/* find the montgomery mp */
+-		if (ltc_mp.montgomery_setup(m, &mp) != CRYPT_OK) { 
+-			goto out; 
+-		}
+-
+-		/* add them */
+-		if (ltc_mp.ecc_ptadd(mQ, mG, mG, m, mp) != CRYPT_OK) { 
+-			goto out; 
+-		}
+-
+-		/* reduce */
+-		if (ltc_mp.ecc_map(mG, m, mp) != CRYPT_OK) { 
+-			goto out; 
+-		}
+-	} else {
+-		/* use Shamir's trick to compute u1*mG + u2*mQ using half of the doubles */
+-		if (ltc_mp.ecc_mul2add(mG, u1, mQ, u2, mG, m) != CRYPT_OK) { 
+-			goto out; 
+-		}
+-	}
+-
+-   /* v = X_x1 mod n */
+-	if (ltc_mp.mpdiv(mG->x, p, NULL, v) != CRYPT_OK) { 
+-		goto out; 
+-	}
+-
+-   /* does v == r */
+-	if (ltc_mp.compare(v, r) == LTC_MP_EQ) {
+-		ret = DROPBEAR_SUCCESS;
+-	}
+-
++	sig_half = ecc_get_size(key);
++	i = mp_unsigned_bin_size(r);
++	if (i > sig_half) goto out;
++	if ((err = mp_to_unsigned_bin(r, rawsig + (sig_half - i))) != CRYPT_OK) goto out;
++	i = mp_unsigned_bin_size(s);
++	if (i > sig_half) goto out;
++	if ((err = mp_to_unsigned_bin(s, rawsig + (2 * sig_half - i))) != CRYPT_OK) goto out;
++
++	err = ecc_verify_hash_rfc7518(rawsig, sig_half * 2,
++					hash, curve->hash_desc->hashsize,
++					&stat, key);
++	if (err == CRYPT_OK && stat == 1) ret = DROPBEAR_SUCCESS;
+ out:
+-	ltc_ecc_del_point(mG);
+-	ltc_ecc_del_point(mQ);
+-	ltc_deinit_multi(r, s, v, w, u1, u2, p, e, m, NULL);
+-	if (mp != NULL) { 
+-		ltc_mp.montgomery_deinit(mp);
+-	}
++	m_mp_free_multi(&r, &s, NULL);
+ 	return ret;
+ }
+ 
+diff --git a/keyimport.c b/keyimport.c
+index ea3164c..2a679ee 100644
+--- a/keyimport.c
++++ b/keyimport.c
+@@ -780,9 +780,7 @@ static sign_key *openssh_read(const char *filename, const char * UNUSED(passphra
+ 			errmsg = "Error parsing ECC key";
+ 			goto error;
+ 		}
+-		m_mp_alloc_init_multi((mp_int**)&ecc->k, NULL);
+-		if (mp_read_unsigned_bin(ecc->k, private_key_bytes, private_key_len)
+-			!= MP_OKAY) {
++		if (ecc_set_key(private_key_bytes, private_key_len, PK_PRIVATE, ecc) != CRYPT_OK) {
+ 			errmsg = "Error parsing ECC key";
+ 			goto error;
+ 		}
+@@ -1050,7 +1048,7 @@ static int openssh_write(const char *filename, sign_key *key,
+ 		*/
+ 		buffer *seq_buf = buf_new(400);
+ 		ecc_key **eck = (ecc_key**)signkey_key_ptr(key, key->type);
+-		const long curve_size = (*eck)->dp->size;
++		const long curve_size = ecc_get_size(*eck);
+ 		int curve_oid_len = 0;
+ 		const void* curve_oid = NULL;
+ 		unsigned long pubkey_size = 2*curve_size+1;

@@ -1,0 +1,27 @@
+diff --git a/tmux.c b/tmux.c
+index f9de920c..c99e8430 100644
+--- a/tmux.c
++++ b/tmux.c
+@@ -216,13 +216,15 @@ main(int argc, char **argv)
+ 	int					 opt, flags, keys;
+ 	const struct options_table_entry	*oe;
+ 
+-	if (setlocale(LC_CTYPE, "en_US.UTF-8") == NULL &&
+-	    setlocale(LC_CTYPE, "C.UTF-8") == NULL) {
+-		if (setlocale(LC_CTYPE, "") == NULL)
+-			errx(1, "invalid LC_ALL, LC_CTYPE or LANG");
+-		s = nl_langinfo(CODESET);
+-		if (strcasecmp(s, "UTF-8") != 0 && strcasecmp(s, "UTF8") != 0)
+-			errx(1, "need UTF-8 locale (LC_CTYPE) but have %s", s);
++	/* Kindle/Kobo Hack: on some FW versions, non en_US locales are wonky... Plus, we need and UTF-8 one, so enforce en_US, and relax checks */
++	setenv("LC_ALL", "en_US.UTF-8", 1);
++
++	if (setlocale(LC_ALL, "") == NULL) {
++		warnx("invalid LC_ALL");
++	}
++	s = nl_langinfo(CODESET);
++	if (strcasecmp(s, "UTF-8") != 0) {
++		warnx("need UTF-8 locale (LC_ALL) but have %s", s);
+ 	}
+ 
+ 	setlocale(LC_TIME, "");
